@@ -1,0 +1,7 @@
+ascasdc
+@php
+
+$user = \App\Models\User::find(1);
+
+@endphp
+asdcadc

@@ -1,0 +1,5 @@
+<html>
+		@include('myPartials.head')
+
+		@include('myPartials.body')
+</html>

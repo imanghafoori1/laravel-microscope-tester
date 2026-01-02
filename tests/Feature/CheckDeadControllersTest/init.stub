@@ -1,0 +1,33 @@
+<?php
+
+namespace App;
+
+use Illuminate\Routing\Controller;
+
+class MyDeadController extends Controller
+{
+	public static function myAction()
+	{
+		return [];
+	}
+
+	public function myAction1()
+	{
+		return [];
+	}
+
+	public function myAction2()
+	{
+		return [];
+	}
+
+	private function myAction3()
+	{
+		return [];
+	}
+
+	public function __construct()
+	{
+		return [];
+	}
+}

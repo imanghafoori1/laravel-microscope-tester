@@ -1,0 +1,13 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Wrong\Namespace;
+
+use App;
+use Namespace\Foo;
+
+class TestClassWithWrongNamespace
+{
+    // Some code
+}

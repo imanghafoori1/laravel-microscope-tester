@@ -1,0 +1,11 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+
+class CreateUser extends Migration
+{
+	public function up ()
+	{
+		//
+	}
+}

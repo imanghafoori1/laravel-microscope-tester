@@ -1,0 +1,9 @@
+<html>
+	{!! extractBlade('myPartials.head') !!}
+		<head>...</head>
+	{!! extractBlade() !!}
+
+	{!! extractBlade('myPartials.body') !!}
+		<body>...</body>
+	{!! extractBlade() !!}
+</html>

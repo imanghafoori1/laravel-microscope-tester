@@ -1,0 +1,8 @@
+<?php
+
+namespace App;
+
+use App\Models\User;
+
+User::query()->where('sdfv', 'sdfv')->get();
+User::query()->orderBy('sdfv', 'desc')->get();

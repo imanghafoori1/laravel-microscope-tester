@@ -1,0 +1,5 @@
+<?php
+
+'App\Models\User';
+'App\Models\User2';
+'\App\Models\User';
