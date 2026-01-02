@@ -1,0 +1,11 @@
+<?php
+
+namespace A;
+
+class R
+{
+	public function T ()
+	{
+	    env('d');
+	}
+}

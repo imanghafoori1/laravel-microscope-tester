@@ -1,0 +1,21 @@
+<?php
+
+namespace App;
+
+class Psr12
+{
+	public function F()
+	{
+		//
+	}
+
+	public static function F2()
+	{
+		//
+	}
+
+	static public function F3()
+	{
+        //
+	}
+}

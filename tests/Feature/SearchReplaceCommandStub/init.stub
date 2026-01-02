@@ -1,0 +1,9 @@
+<?php
+
+return [
+    "auth_id" => [
+        "search" => "Auth::id();",
+        "replace" => "auth()->id();",
+        // "post_replace" => ""
+    ],
+];

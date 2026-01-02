@@ -1,0 +1,3 @@
+<?php
+
+\Wrong\Namespace\TestClassWithWrongNamespace::class;

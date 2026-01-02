@@ -1,0 +1,10 @@
+<?php
+
+function a ($a) {
+    D::dump('sdfvsf');
+    D::dd('sdfvsf');
+    $a->dump('sdfv');
+    $a->dd('sdfv');
+    DD('sfvsf');
+    dd('sfvsf');
+}

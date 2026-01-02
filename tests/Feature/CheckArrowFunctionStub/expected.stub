@@ -1,0 +1,17 @@
+<?php
+
+function ($a) {
+	'aa' && $a;
+};
+
+function (int $a) {
+	$a;
+
+	return 'aa' && $a;
+};
+
+fn (int $a) => 'aa' && $a;
+
+fn (int $a, bool $b) => 'aa' && $a;
+
+fn ($a) => 'aa' && $a;

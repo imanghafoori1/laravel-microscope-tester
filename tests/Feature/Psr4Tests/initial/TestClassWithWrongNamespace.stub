@@ -1,0 +1,8 @@
+<?php
+
+namespace Wrong\Namespace;
+
+class TestClassWithWrongNamespace
+{
+    // Some code
+}

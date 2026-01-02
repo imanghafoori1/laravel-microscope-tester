@@ -1,0 +1,9 @@
+<?php
+
+if (isset($a)):
+    foreach ($a as $b):
+        $r = '';
+    endforeach;
+else:
+	$a = 2;
+endif;

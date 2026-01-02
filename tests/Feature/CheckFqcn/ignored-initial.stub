@@ -1,0 +1,12 @@
+<?php
+
+namespace He\R\T;
+
+class Fqcn2
+{
+	public function W()
+	{
+		\He\R\T\U2::class;
+		\He\R\T\Hh::class;
+	}
+}

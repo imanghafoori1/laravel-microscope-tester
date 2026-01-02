@@ -1,0 +1,13 @@
+<?php
+
+namespace App;
+
+use App\Models\SampleRef;
+
+class Hello
+{
+	 public function Roo ()
+	 {
+		return SampleRef::class;
+	}
+}

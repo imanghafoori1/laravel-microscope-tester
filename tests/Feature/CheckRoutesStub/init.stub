@@ -1,0 +1,12 @@
+<?php
+
+namespace App;
+
+class ABC
+{
+    public function F($a)
+    {
+        Route('sss');
+        Route($a);
+    }
+}

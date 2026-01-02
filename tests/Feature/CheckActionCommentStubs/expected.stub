@@ -1,0 +1,19 @@
+<?php
+
+namespace App;
+
+use Illuminate\Routing\Controller;
+
+class MyController extends Controller
+{
+	public function myAction()
+	{
+        /**
+         * @get('/url-route')
+         * @name('name_route')
+         * @middlewares('web')
+         *
+         */
+		return [];
+	}
+}

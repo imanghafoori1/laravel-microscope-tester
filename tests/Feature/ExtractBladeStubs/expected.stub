@@ -1,0 +1,5 @@
+<html>
+		@include('myPartials.head')
+
+		@include('ns::myPartials.body')
+</html>

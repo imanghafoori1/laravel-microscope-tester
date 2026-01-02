@@ -1,0 +1,15 @@
+<?php
+
+namespace App;
+
+use Illuminate\Support\Facades\Route;
+
+class Views {
+	function F($a)
+	{
+		View::make($a);
+		View::make('make');
+		Route::view('route', 'route_view');
+		return view('abc', ['a' => 'we']);
+	}
+}

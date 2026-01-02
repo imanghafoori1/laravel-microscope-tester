@@ -1,0 +1,10 @@
+<?php
+
+namespace App\Models;
+
+'App\Models\User';
+'App\Models\User2';
+'\App\Models\User';
+'App\Models\User2@hello';
+'\App\Models\User2@hello';
+'\App\Models\User@hello';

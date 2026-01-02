@@ -1,0 +1,13 @@
+<?php
+
+namespace App;
+
+use Illuminate\Support\Facades\Facade;
+
+class SampleFacade extends Facade
+{
+    public static function getFacadeAccessor()
+    {
+        return MySampleRoot::class;
+    }
+}

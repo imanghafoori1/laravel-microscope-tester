@@ -1,0 +1,10 @@
+<?php
+
+namespace App;
+
+use Illuminate\Routing\Controller;
+
+abstract class AbstractCtrl extends Controller
+{
+    //
+}

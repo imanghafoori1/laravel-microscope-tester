@@ -1,0 +1,13 @@
+<?php
+
+namespace App;
+
+use Illuminate\Support\Facades\Facade;
+
+class NoRootFacade extends Facade
+{
+    public static function getFacadeAccessor()
+    {
+        return 'NoRoot';
+    }
+}

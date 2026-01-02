@@ -1,0 +1,7 @@
+<?php
+
+$a = 1;
+
+abort_if($a > 5, 404);
+
+abort_if($a > 5);
