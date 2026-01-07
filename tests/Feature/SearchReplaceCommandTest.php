@@ -6,14 +6,10 @@ use Imanghafoori\LaravelMicroscope\Foundations\Reports\ComposerJsonReport;
 
 class SearchReplaceCommandTest extends TestCase
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-        ErrorPrinter::$instance = null;
-    }
-
     public function tearDown(): void
     {
+        ErrorPrinter::$instance = null;
+        @unlink($this->mainPath());
         @unlink($this->mainPath());
         parent::tearDown();
     }
@@ -25,6 +21,9 @@ class SearchReplaceCommandTest extends TestCase
         $this->assertEquals(0, $r);
 
         $this->assertFileExists($this->mainPath());
+        @unlink($this->mainPath());
+        copy(__DIR__.'/SearchReplaceCommandStub/init.stub', $this->mainPath());
+        $this->artisan('search_replace')->run();
     }
 
     private function mainPath()

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\TestCase;
+use Imanghafoori\LaravelMicroscope\ErrorReporters\ErrorPrinter;
 use Imanghafoori\LaravelMicroscope\Foundations\Reports\ComposerJsonReport;
 
 class CheckEarlyTest extends TestCase
@@ -13,6 +14,7 @@ class CheckEarlyTest extends TestCase
 
     public function tearDown(): void
     {
+        ErrorPrinter::$instance = null;
         ComposerJsonReport::$callback = null;
         @unlink($this->mainPath());
         parent::tearDown();

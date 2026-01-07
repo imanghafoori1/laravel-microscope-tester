@@ -1,7 +1,9 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Foundation\Testing\TestCase;
+use Imanghafoori\ImportAnalyzer\ErrorReporters\ErrorPrinter;
 use Imanghafoori\LaravelMicroscope\Foundations\Reports\ComposerJsonReport;
 
 class CheckAliasesTest extends TestCase
@@ -15,6 +17,7 @@ class CheckAliasesTest extends TestCase
 
     public function tearDown(): void
     {
+        ErrorPrinter::$instance = null;
         ComposerJsonReport::$callback = null;
         @unlink($this->mainPath());
         parent::tearDown();
@@ -22,7 +25,8 @@ class CheckAliasesTest extends TestCase
 
     public function test()
     {
-        AliasLoader::getInstance()->alias('MyAlias', \App\Models\User::class);
+        AliasLoader::getInstance()->alias('MyAlias', User::class);
+        AliasLoader::getInstance()->alias('MyAlias2', 'App\\Models\\User2');
 
         $r = $this->artisan('check:aliases')
             ->expectsOutputToContain('🔍 Looking Facade Aliases...')
@@ -33,6 +37,7 @@ class CheckAliasesTest extends TestCase
             ->expectsConfirmation('Do you want to replace <fg=yellow>Rate</> with <fg=yellow>Illuminate\Support\Facades\Gate</>', 'yes')
             ->expectsConfirmation('Do you want to replace <fg=yellow>Response</> with <fg=yellow>Illuminate\Support\Facades\Response</>', 'yes')
             ->expectsConfirmation('Do you want to replace <fg=yellow>MyAlias</> with <fg=yellow>App\Models\User</>', 'yes')
+            ->expectsConfirmation('Do you want to replace <fg=yellow>MyAlias2</> with <fg=yellow>App\Models\User2</>', 'yes')
             ->run();
 
         $this->assertEquals(0, $r);

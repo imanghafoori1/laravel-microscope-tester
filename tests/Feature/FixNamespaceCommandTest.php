@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Support\Composer;
 use Illuminate\Support\Facades\File;
+use Imanghafoori\ImportAnalyzer\ErrorReporters\ErrorPrinter;
 use Imanghafoori\LaravelMicroscope\Features\Psr4\Console\NamespaceFixer\NamespaceFixerMessages;
 use Imanghafoori\LaravelMicroscope\Features\Psr4\Console\Psr4Errors;
 use PHPUnit\Framework\Attributes\Test;
@@ -42,11 +43,29 @@ class FixNamespaceCommandTest extends TestCase
 
     protected function tearDown(): void
     {
+        ErrorPrinter::$instance = null;
         // Clean up after tests
         $this->cleanUpTestDirectory();
         file_put_contents(base_path('composer.json'), self::$composerJson);
 
         parent::tearDown();
+    }
+
+    #[Test]
+    public function it_detects_wrong_namespaces_in_php_files()
+    {
+        // Create test files with incorrect/missing namespaces
+        $this->createTestFiles();
+        $this->mock(Composer::class)->shouldReceive('dumpAutoloads')->once();
+        NamespaceFixerMessages::$pause = 20;
+        Psr4Errors::$pause = 70;
+
+        $this->artisan('check:psr4 --nofix')
+            ->expectsOutputToContain("The file name and the class name are different.")
+            ->expectsOutputToContain('Namespace of class "Wrong\Namespace\TestClassWithWrongNamespace" should be:')
+            ->expectsOutputToContain('Models')
+            ->expectsOutputToContain('Namespace of class "\TestClassWithoutNamespace" should be:')
+            ->run();
     }
 
     #[Test]
@@ -71,6 +90,7 @@ class FixNamespaceCommandTest extends TestCase
             ->expectsOutputToContain(str_replace('\\', DIRECTORY_SEPARATOR,'at app\TestNamespaceFixer\TestClassWithWrongNamespace.php:3'))
             ->expectsOutputToContain(str_replace('\\', DIRECTORY_SEPARATOR,'at app\TestNamespaceFixer\SubDir\TestClassWithoutNamespace.php:3'))
             ->expectsOutputToContain('Incorrect namespace: \'Wrong\Namespace\'')
+            ->expectsOutputToContain('The file name and the class name are different.')
             ->run();
         // Check output contains expected messages
         $this->assertEquals(

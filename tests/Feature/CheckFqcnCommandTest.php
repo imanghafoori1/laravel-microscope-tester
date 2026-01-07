@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\TestCase;
+use Imanghafoori\LaravelMicroscope\ErrorReporters\ErrorPrinter;
 
 class CheckFqcnCommandTest extends TestCase
 {
@@ -13,6 +14,7 @@ class CheckFqcnCommandTest extends TestCase
 
     public function tearDown(): void
     {
+        ErrorPrinter::$instance = null;
         $path = app_path('Fqcn.php');
         parent::tearDown();
         unlink($path);

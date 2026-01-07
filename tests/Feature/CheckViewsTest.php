@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\TestCase;
+use Imanghafoori\ImportAnalyzer\ErrorReporters\ErrorPrinter;
 use Imanghafoori\LaravelMicroscope\Foundations\Reports\ComposerJsonReport;
 use Imanghafoori\LaravelMicroscope\Foundations\Iterators\BladeFiles\CheckBladePaths;
 
@@ -20,6 +21,7 @@ class CheckViewsTest extends TestCase
 
     public function tearDown(): void
     {
+        ErrorPrinter::$instance = null;
         CheckBladePaths::$scanned = [];
         @unlink($this->mainPath());
         @unlink($this->bladePath());

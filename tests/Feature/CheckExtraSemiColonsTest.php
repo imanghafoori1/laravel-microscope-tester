@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Foundation\Testing\TestCase;
+use Imanghafoori\LaravelMicroscope\ErrorReporters\ErrorPrinter;
+use Imanghafoori\LaravelMicroscope\Foundations\Reports\ComposerJsonReport;
 
 class CheckExtraSemiColonsTest extends TestCase
 {
@@ -11,6 +13,8 @@ class CheckExtraSemiColonsTest extends TestCase
 
     public function tearDown(): void
     {
+        ComposerJsonReport::$callback = null;
+        ErrorPrinter::$instance = null;
         parent::tearDown();
     }
 

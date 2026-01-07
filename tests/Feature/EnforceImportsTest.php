@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\TestCase;
+use Imanghafoori\ImportAnalyzer\ErrorReporters\ErrorPrinter;
 use Imanghafoori\LaravelMicroscope\Foundations\Reports\ComposerJsonReport;
 
 class EnforceImportsTest extends TestCase
@@ -14,6 +15,7 @@ class EnforceImportsTest extends TestCase
 
     public function tearDown(): void
     {
+        ErrorPrinter::$instance = null;
         @unlink($this->mainPath());
         parent::tearDown();
     }

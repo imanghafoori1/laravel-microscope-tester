@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\TestCase;
+use Imanghafoori\ImportAnalyzer\ErrorReporters\ErrorPrinter;
 use Imanghafoori\LaravelMicroscope\SpyClasses\RoutePaths;
 
 class CheckDdTest extends TestCase
@@ -17,6 +18,7 @@ class CheckDdTest extends TestCase
 
     public function tearDown(): void
     {
+        ErrorPrinter::$instance = null;
         RoutePaths::$providers = [];
         RoutePaths::$additionalFiles = [];
         @unlink(base_path('routes/web2.php'));

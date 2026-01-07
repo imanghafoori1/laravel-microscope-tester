@@ -8,7 +8,6 @@ class CheckGenericDocblocksTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        ErrorPrinter::$instance = null;
         copy(__DIR__.'/CheckGenericDocblocksStubs/init.stub', $this->mainPath());
     }
 

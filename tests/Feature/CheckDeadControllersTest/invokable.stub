@@ -1,0 +1,13 @@
+<?php
+
+namespace App;
+
+use Illuminate\Routing\Controller;
+
+class InvokableCtrl extends Controller
+{
+    public function __invoke()
+    {
+    	//
+    }
+}

@@ -8,7 +8,6 @@ class CheckFacadesTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        ErrorPrinter::$instance = null;
         copy(__DIR__.'/CheckFacadeDocblocksStubs/SampleFacade.stub', app_path('SampleFacade.php'));
         copy(__DIR__.'/CheckFacadeDocblocksStubs/MySampleRoot.stub', app_path('MySampleRoot.php'));
     }

@@ -8,12 +8,12 @@ class CheckPsr12Test extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        ErrorPrinter::$instance = null;
         copy(__DIR__.'/CheckPsr12Stub/init.stub', $this->mainPath());
     }
 
     public function tearDown(): void
     {
+        ErrorPrinter::$instance = null;
         @unlink($this->mainPath());
         parent::tearDown();
     }

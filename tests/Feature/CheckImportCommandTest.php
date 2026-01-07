@@ -18,7 +18,6 @@ class CheckImportCommandTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        ErrorPrinter::$instance = null;
         @mkdir(base_path('dev-classes'));
         copy(
             __DIR__.'/CheckImportsStubs/imports.stub',

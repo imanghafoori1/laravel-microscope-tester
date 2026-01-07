@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\TestCase;
+use Imanghafoori\ImportAnalyzer\ErrorReporters\ErrorPrinter;
 
 class EnforceHelpersTest extends TestCase
 {
@@ -13,6 +14,7 @@ class EnforceHelpersTest extends TestCase
 
     public function tearDown(): void
     {
+        ErrorPrinter::$instance = null;
         parent::tearDown();
         @unlink(app_path('Helper.php'));
     }

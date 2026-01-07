@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\TestCase;
+use Imanghafoori\ImportAnalyzer\ErrorReporters\ErrorPrinter;
 use Imanghafoori\LaravelMicroscope\Foundations\Reports\ComposerJsonReport;
 
 class CheckBadPracticesTest extends TestCase
@@ -15,6 +16,7 @@ class CheckBadPracticesTest extends TestCase
 
     public function tearDown(): void
     {
+        ErrorPrinter::$instance = null;
         ComposerJsonReport::$callback = null;
         @unlink($this->mainPath());
         parent::tearDown();

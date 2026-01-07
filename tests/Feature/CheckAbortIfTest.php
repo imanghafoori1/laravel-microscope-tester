@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\TestCase;
+use Imanghafoori\ImportAnalyzer\ErrorReporters\ErrorPrinter;
 use Imanghafoori\LaravelMicroscope\Foundations\Reports\ComposerJsonReport;
 
 class CheckAbortIfTest extends TestCase
@@ -13,6 +14,7 @@ class CheckAbortIfTest extends TestCase
 
     public function tearDown(): void
     {
+        ErrorPrinter::$instance = null;
         ComposerJsonReport::$callback = null;
         @unlink($this->mainPath());
         parent::tearDown();

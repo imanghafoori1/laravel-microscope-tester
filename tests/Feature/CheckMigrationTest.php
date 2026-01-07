@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\TestCase;
+use Imanghafoori\LaravelMicroscope\ErrorReporters\ErrorPrinter;
 use Imanghafoori\LaravelMicroscope\Foundations\Reports\ComposerJsonReport;
 use Imanghafoori\LaravelMicroscope\LaravelPaths\LaravelPaths;
 
@@ -16,6 +17,7 @@ class CheckMigrationTest extends TestCase
     public function tearDown(): void
     {
         LaravelPaths::$migrationDirs = [];
+        ErrorPrinter::$instance = null;
         ComposerJsonReport::$callback = null;
         @rmdir(database_path('migrations2'));
         @unlink($this->mainPath());

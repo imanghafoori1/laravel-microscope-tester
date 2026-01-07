@@ -2,7 +2,6 @@
 
 use Illuminate\Foundation\Testing\TestCase;
 use Imanghafoori\LaravelMicroscope\ErrorReporters\ErrorPrinter;
-use Imanghafoori\LaravelMicroscope\Foundations\Reports\ComposerJsonReport;
 
 class CheckEndIfTest extends TestCase
 {
@@ -15,6 +14,7 @@ class CheckEndIfTest extends TestCase
 
     public function tearDown(): void
     {
+        ErrorPrinter::$instance = null;
         @unlink($this->mainPath());
         parent::tearDown();
     }

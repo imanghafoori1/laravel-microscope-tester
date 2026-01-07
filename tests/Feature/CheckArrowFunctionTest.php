@@ -9,12 +9,12 @@ class CheckArrowFunctionTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        ErrorPrinter::$instance = null;
         copy(__DIR__.'/CheckArrowFunctionStub/init.stub', $this->mainPath());
     }
 
     public function tearDown(): void
     {
+        ErrorPrinter::$instance = null;
         ComposerJsonReport::$callback = null;
         @unlink($this->mainPath());
         parent::tearDown();

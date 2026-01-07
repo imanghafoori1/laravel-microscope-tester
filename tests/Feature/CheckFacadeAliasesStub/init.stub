@@ -9,6 +9,8 @@ use Request as Mate;
 use \Gate as Rate;
 use \Response;
 use MyAlias;
+use \MyAlias2;
+use User2;
 
 class Aliases
 {

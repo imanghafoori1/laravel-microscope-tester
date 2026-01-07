@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\TestCase;
+use Imanghafoori\LaravelMicroscope\ErrorReporters\ErrorPrinter;
 use Imanghafoori\LaravelMicroscope\Foundations\Reports\ComposerJsonReport;
 
 class CheckEmptyCommentTest extends TestCase
@@ -16,6 +17,7 @@ class CheckEmptyCommentTest extends TestCase
     public function tearDown(): void
     {
         @unlink($this->mainPath());
+        ErrorPrinter::$instance = null;
         ComposerJsonReport::$callback = null;
         parent::tearDown();
     }

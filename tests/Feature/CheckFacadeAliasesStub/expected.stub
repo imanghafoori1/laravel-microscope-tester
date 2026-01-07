@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Request as Mate;
 use Illuminate\Support\Facades\Gate as Rate;
 use Illuminate\Support\Facades\Response;
 use App\Models\User as MyAlias;
+use App\Models\User2 as MyAlias2;
+use User2;
 
 class Aliases
 {
