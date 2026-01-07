@@ -6,5 +6,4 @@ function a ($a) {
     $a->dump('sdfv');
     $a->dd('sdfv');
     dd('sfvsf');
-    dump('sdvfsfdv');
 }

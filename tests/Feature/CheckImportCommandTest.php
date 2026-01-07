@@ -30,8 +30,8 @@ class CheckImportCommandTest extends TestCase
     {
         ErrorPrinter::$instance = null;
 
-        unlink(base_path('dev-classes/Imports.php'));
-        rmdir(base_path('dev-classes'));
+        @unlink(base_path('dev-classes/Imports.php'));
+        @rmdir(base_path('dev-classes'));
         parent::tearDown();
     }
 

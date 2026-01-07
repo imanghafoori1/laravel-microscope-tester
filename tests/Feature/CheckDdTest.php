@@ -8,12 +8,19 @@ class CheckDdTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        RoutePaths::$paths = [base_path('routes/web.php')];
+        RoutePaths::$additionalFiles = [base_path('routes/web2.php')];
+        RoutePaths::$providers = ['App\\Provider'];
         copy(__DIR__.'/CheckDDStubs/init.stub', $this->mainPath());
+        copy(__DIR__.'/CheckDDStubs/sample_route.stub', base_path('routes/web2.php'));
+        copy(__DIR__.'/CheckDDStubs/provider.stub', app_path('Provider.php'));
     }
 
     public function tearDown(): void
     {
+        RoutePaths::$providers = [];
+        RoutePaths::$additionalFiles = [];
+        @unlink(base_path('routes/web2.php'));
+        @unlink(app_path('Provider.php'));
         @unlink($this->mainPath());
         parent::tearDown();
     }
