@@ -1,12 +1,14 @@
 <?php
 
 use Illuminate\Foundation\Testing\TestCase;
+use Imanghafoori\LaravelMicroscope\SpyClasses\RoutePaths;
 
 class CheckDdTest extends TestCase
 {
     public function setUp(): void
     {
         parent::setUp();
+        RoutePaths::$paths = [base_path('routes/web.php')];
         copy(__DIR__.'/CheckDDStubs/init.stub', $this->mainPath());
     }
 
