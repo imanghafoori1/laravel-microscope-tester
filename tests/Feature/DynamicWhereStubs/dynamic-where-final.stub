@@ -1,0 +1,8 @@
+<?php
+
+namespace App;
+
+use App\Models\User;
+
+User::query()->where('product_id', $id)->get();
+User::where('id', 4)->where('product_id', $id)->get();

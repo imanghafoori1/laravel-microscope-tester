@@ -1,0 +1,8 @@
+<?php
+
+namespace App;
+
+use App\Models\User;
+
+User::whereProductId($id)->get();
+User::where('id', 4)->whereProductId($id)->get();
