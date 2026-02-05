@@ -1,0 +1,19 @@
+<?php
+
+use App;
+use App\Models\User;
+use App\User as Mooser;
+use App2; // extra
+use App4;
+use App\Http\{A,B};
+
+class T extends Mooser
+{
+	public function A()
+	{
+		App::class;
+		App3::class;
+		\Wrong::class;
+		'App\Models\User2@hello';
+	}
+}

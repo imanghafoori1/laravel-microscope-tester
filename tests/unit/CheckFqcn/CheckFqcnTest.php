@@ -1,6 +1,6 @@
 <?php
 
-namespace Imanghafoori\LaravelMicroscope\Tests\CheckFqcn;
+namespace Imanghafoori\LaravelMicroscope\Tests\Unit;
 
 use Imanghafoori\LaravelMicroscope\ErrorReporters\ErrorPrinter;
 use Imanghafoori\LaravelMicroscope\Features\CheckExtraFQCN\ExtraFQCN;
@@ -22,7 +22,7 @@ class CheckFqcnTest extends TestCase
 
     public function testFixFile()
     {
-        ExtraFQCN::$imports = self::useStatementParser();
+        ExtraFQCN::$imports = self::class;
         ExtraFQCN::$fix = true;
 
         $result = ExtraFQCN::performCheck(PhpFileDescriptor::make(__DIR__.'/fqcn.temp'));
@@ -40,16 +40,14 @@ class CheckFqcnTest extends TestCase
     }
 
     #[Pure]
-    private static function useStatementParser()
+    public static function parse(PhpFileDescriptor $file)
     {
-        return function (PhpFileDescriptor $file) {
-            return [
-                'He\R\T\A' => [
-                    'E' => ['C\E', 5],
-                    'Hh' => ['H', 6],
-                    'G' => ['He\R\T\Hh', 7],
-                ],
-            ];
-        };
+        return [
+            'He\R\T\A' => [
+                'E' => ['C\E', 5],
+                'Hh' => ['H', 6],
+                'G' => ['He\R\T\Hh', 7],
+            ],
+        ];
     }
 }

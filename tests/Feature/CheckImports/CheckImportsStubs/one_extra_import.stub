@@ -1,0 +1,6 @@
+<?php
+
+use App;
+use ExraWrng;
+
+class A extends T {}

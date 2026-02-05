@@ -1,10 +1,9 @@
 <?php
 
-namespace Imanghafoori\LaravelMicroscope\Tests\EnforceImports;
+namespace Imanghafoori\LaravelMicroscope\Tests\Unit;
 
 use Imanghafoori\LaravelMicroscope\Features\EnforceImports\EnforceImports;
 use Imanghafoori\LaravelMicroscope\Foundations\PhpFileDescriptor;
-use Imanghafoori\TokenAnalyzer\ParseUseStatement;
 use PHPUnit\Framework\TestCase;
 
 class EnforceImportsTest extends TestCase
@@ -21,11 +20,7 @@ class EnforceImportsTest extends TestCase
 
     public function testFixFile()
     {
-        EnforceImports::setOptions(false, 'U3', function (PhpFileDescriptor $file) {
-            $imports = ParseUseStatement::parseUseStatements($file->getTokens());
-
-            return $imports[0] ?: [$imports[1]];
-        }, function ($err) {
+        EnforceImports::setOptions(false, 'U3', function ($err) {
         });
         $result = EnforceImports::performCheck(
             PhpFileDescriptor::make(__DIR__.DIRECTORY_SEPARATOR.'imports.temp')

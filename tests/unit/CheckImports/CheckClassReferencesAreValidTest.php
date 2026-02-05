@@ -5,7 +5,6 @@ namespace Imanghafoori\LaravelMicroscope\Tests\CheckImports;
 use Imanghafoori\LaravelMicroscope\Features\CheckImports\Checks\CheckClassReferencesAreValid;
 use Imanghafoori\LaravelMicroscope\Foundations\PhpFileDescriptor;
 use Imanghafoori\TokenAnalyzer\ImportsAnalyzer;
-use Imanghafoori\TokenAnalyzer\ParseUseStatement;
 use PHPUnit\Framework\TestCase;
 
 class CheckClassReferencesAreValidTest extends TestCase
@@ -24,11 +23,6 @@ class CheckClassReferencesAreValidTest extends TestCase
             }
         };
 
-        CheckClassReferencesAreValid::$importsProvider = function (PhpFileDescriptor $file) {
-            $imports = ParseUseStatement::parseUseStatements($file->getTokens());
-
-            return $imports[0] ?: [$imports[1]];
-        };
         CheckClassReferencesAreValid::check($file);
 
         $unusedWrongImportsHandler = MockerUnusedWrongImportsHandler::$calls;

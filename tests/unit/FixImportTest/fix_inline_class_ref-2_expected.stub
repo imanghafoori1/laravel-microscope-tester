@@ -1,0 +1,11 @@
+<?php
+
+namespace App;
+
+class R3
+{
+	public function a()
+	{
+        Sample::class;
+	}
+}

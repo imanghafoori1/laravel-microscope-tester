@@ -5,8 +5,8 @@ namespace Imanghafoori\LaravelMicroscope\Tests;
 use Imanghafoori\Filesystem\FakeFilesystem;
 use Imanghafoori\Filesystem\FileManipulator;
 use Imanghafoori\Filesystem\Filesystem;
-use Imanghafoori\LaravelMicroscope\ClassListProvider;
 use Imanghafoori\LaravelMicroscope\Features\Psr4\NamespaceFixer;
+use Imanghafoori\LaravelMicroscope\Foundations\ClassListProvider;
 use Imanghafoori\LaravelMicroscope\Foundations\PhpFileDescriptor;
 use PHPUnit\Framework\TestCase;
 
@@ -45,13 +45,17 @@ class NamespaceCorrectorTest extends TestCase
         $fileName = 'DNS.php';
         $relativePath = "\branding_manager\app\Cert\DNS.php"; // windows path
 
-        $result = ClassListProvider::derive($psr4Path, $relativePath, $namespace, $fileName);
+        $closure = \Closure::bind(function($psr4Path, $relativePath, $namespace, $fileName) {
+            return self::derive($psr4Path, $relativePath, $namespace, $fileName);
+        }, null, ClassListProvider::class);
+
+        $result = $closure($psr4Path, $relativePath, $namespace, $fileName);
 
         $this->assertEquals('DNS', $result[0]);
         $this->assertEquals("Branding\Cert\DNS", $result[1]);
 
         $relativePath = '/branding_manager/app/Cert/DNS.php'; // unix paths
-        $result = ClassListProvider::derive($psr4Path, $relativePath, $namespace, $fileName);
+        $result = $closure($psr4Path, $relativePath, $namespace, $fileName);
 
         $this->assertEquals('DNS', $result[0]);
         $this->assertEquals("Branding\Cert\DNS", $result[1]);

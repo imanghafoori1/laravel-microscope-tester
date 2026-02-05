@@ -1,9 +1,0 @@
-ascasdc
-@php
-
-$user = \App\Models\User::find(1);
-$us2r = \DB::table('s')->get();
-$us3r = DB::table('s')->get();
-
-@endphp
-asdcadc

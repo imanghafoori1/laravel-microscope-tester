@@ -1,0 +1,13 @@
+<?php
+
+namespace App\Models;
+
+use App\Wrong\Sample2;
+
+class R2
+{
+	public function a()
+	{
+        \App\Wrong\Sample::class;
+	}
+}

@@ -11,9 +11,11 @@ class CheckGatesTest extends TestCase
     {
         SpyGate::start();
         app(GateContract::class)->define('update', fn ($user) => true);
+        app(GateContract::class)->define('update', fn ($user) => true);
         app(GateContract::class)->define('update', 'f@f');
         app(GateContract::class)->define('update', User::class);
         app(GateContract::class)->define('update', User::class.'@s');
+        app(GateContract::class)->policy('a', 'a@a');
         $r = $this->artisan('check:gates')->run();
 
         $this->assertEquals(0, $r);

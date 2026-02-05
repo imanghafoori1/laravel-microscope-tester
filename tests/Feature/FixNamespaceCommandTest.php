@@ -3,8 +3,8 @@
 use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Support\Composer;
 use Illuminate\Support\Facades\File;
+use Imanghafoori\LaravelMicroscope\Features\Psr4\Console\AskAndFixNamespace;
 use Imanghafoori\LaravelMicroscope\Features\Psr4\Console\NamespaceFixer\NamespaceFixerMessages;
-use Imanghafoori\LaravelMicroscope\Features\Psr4\Console\Psr4Errors;
 use Imanghafoori\LaravelMicroscope\Foundations\Color;
 use PHPUnit\Framework\Attributes\Test;
 
@@ -58,7 +58,7 @@ class FixNamespaceCommandTest extends TestCase
         $this->createTestFiles();
         $this->mock(Composer::class)->shouldReceive('dumpAutoloads')->once();
         NamespaceFixerMessages::$pause = 20;
-        Psr4Errors::$pause = 70;
+        AskAndFixNamespace::$pause = 70;
 
         $this->artisan('check:psr4 --nofix')
             ->expectsOutputToContain("The file name and the class name are different.")
@@ -75,7 +75,7 @@ class FixNamespaceCommandTest extends TestCase
         $this->createTestFiles();
         $this->mock(Composer::class)->shouldReceive('dumpAutoloads')->once();
         NamespaceFixerMessages::$pause = 0;
-        Psr4Errors::$pause = 0;
+        AskAndFixNamespace::$pause = 0;
         // Run the artisan command on our test directory
         $this->artisan('check:psr4')
             ->expectsConfirmation("Do you want to change it to: Models", 'yes')

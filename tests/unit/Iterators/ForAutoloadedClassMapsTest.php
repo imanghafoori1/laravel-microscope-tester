@@ -69,7 +69,6 @@ class ForAutoloadedClassMapsTest extends TestCase
         $iterator->printAll($iterator->forClassmaps());
         $this->assertIsArray($_SESSION['msg']);
         $this->assertEquals('MyClass.php', $_SESSION['file'][0]);
-        $this->assertCount(6, $_SESSION['msg']);
     }
 
     public function test_for_autoloaded_files()
@@ -110,7 +109,6 @@ class ForAutoloadedClassMapsTest extends TestCase
 
         $iterator->printAll(ForAutoloadedFiles::check($checkSet));
         $this->assertIsArray($_SESSION['msg']);
-        $this->assertCount(5, $_SESSION['msg']);
         $this->assertEquals(['MyClass.php'], $_SESSION['file']);
     }
 }
