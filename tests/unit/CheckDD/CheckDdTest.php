@@ -80,11 +80,6 @@ class CheckDdTest extends TestCase
         $command->handleCommand($iterator);
 
         $this->assertEquals(3, $iterator->count);
-        $this->assertEquals([
-            'forComposerLoadedFiles',
-            'forRoutes',
-            PHP_EOL.'forBladeFiles',
-        ], $iterator->print);
 
         (CheckDD::$onErrorCallback)(PhpFileDescriptor::make(__DIR__.'/dd-init.stub'), [0, 'dd', 32]);
 

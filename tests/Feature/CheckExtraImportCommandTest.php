@@ -52,32 +52,33 @@ class CheckExtraImportCommandTest extends TestCase
             ->expectsOutputToContain('Database\\Seeders\\:')
             ->expectsOutputToContain('Dev\\:')
             ->expectsOutputToContain('routes/web.php')
-            ->expectsOutputToContain('30 references were checked, 5 errors found.')
+            ->expectsOutputToContain('24 imports were checked.')
+            ->expectsOutputToContain(' 🔸 5 unused imports found.')
             //
             ->expectsOutputToContain('   ➖  config/ (10 files)')
             ->expectsOutputToContain('   ➖  database/migrations/ (2 files)')
             ->expectsOutputToContain('class_map/ (1 file)')
-            ->expectsOutputToContain('Autoloaded files')
+            ->expectsOutputToContain('Autoloaded files (1 file)')
             //
             ->expectsOutputToContain('_____________')
-            ->expectsOutputToContain('1 Extra Import:')
-            ->expectsOutputToContain('App\Models\User')
-            ->expectsOutputToContain("at dev-classes{$ds}Imports.php:4")
+            ->expectsOutputToContain('    ➖  helpers.php')
+            ->expectsOutput('   1 Extra Import: User')
+            ->expectsOutput('   use App\Models\User;')
+            ->expectsOutput("at dev-classes{$ds}Imports.php:4")
             //
-            ->expectsOutputToContain('2 Extra Import:')
-            ->expectsOutputToContain('App2')
-            ->expectsOutputToContain("at dev-classes{$ds}Imports.php:6")
+            ->expectsOutput('   2 Extra Import: App2')
+            ->expectsOutput('   use App2; // extra')
+            ->expectsOutput("at dev-classes{$ds}Imports.php:6")
             //
-            ->expectsOutputToContain('3 Extra Import:')
-            ->expectsOutputToContain('App4')
-            ->expectsOutputToContain("at dev-classes{$ds}Imports.php:7")
+            ->expectsOutput('   3 Extra Import: App4')
+            ->expectsOutput('   use App4;')
+            ->expectsOutput("at dev-classes{$ds}Imports.php:7")
             //
-            ->expectsOutputToContain('4 Extra Import:')
-            ->expectsOutputToContain('App\Http\A')
-            ->expectsOutputToContain("at dev-classes{$ds}Imports.php:8")
+            ->expectsOutput('   4 Extra Import: A')
             //
-            ->expectsOutputToContain('5 Extra Import:')
-            ->expectsOutputToContain('App\Http\B')
+            ->expectsOutputToContain('  5 Extra Import: B')
+            ->expectsOutputToContain('  use App\Http\{A,B};')
+            ->expectsOutput("at dev-classes{$ds}Imports.php:8")
             //
             ->run();
 

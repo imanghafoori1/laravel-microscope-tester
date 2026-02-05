@@ -3,7 +3,7 @@
 use App;
 use App\Models\User;
 use App\User as Mooser;
-use App2;
+use App2; // extra
 use App4;
 use App\Http\{A,B};
 

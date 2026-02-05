@@ -55,13 +55,6 @@ class CheckImportCommandTest extends TestCase
             ->run();
     }
 
-    //#[Test]
-    //public function test_1()
-    //{
-    //    ClassAtMethodHandler::$fix = true;
-    //    ClassAtMethodHandler::handle($file, $atSignTokens);
-    //}
-
     #[Test]
     public function test_2()
     {
@@ -72,32 +65,66 @@ class CheckImportCommandTest extends TestCase
             ->expectsOutput('Checking imports and class references...')
             ->expectsOutput('Imports were checked under:')
             ->expectsOutputToContain('./composer.json')
+            ->expectsOutputToContain(' ⬛️ Overall:')
             ->expectsOutputToContain('➖  PSR-4')
             ->expectsOutputToContain('./app/')
             ->expectsOutputToContain('./database/factories/')
             ->expectsOutputToContain('./database/seeders/')
             ->expectsOutputToContain('./dev-classes/')
-            ->expectsOutputToContain('App\\:')
-            ->expectsOutputToContain('Database\\Factories\\:')
-            ->expectsOutputToContain('Database\\Seeders\\:')
-            ->expectsOutputToContain('Dev\\:')
-            ->expectsOutputToContain('routes/web.php')
-            ->expectsOutputToContain('Unused & wrong import:')
-            ->expectsOutputToContain('Inline class Ref does not exist:')
-            ->expectsOutputToContain("at dev-classes{$ds}Imports.php:6")
+            ->expectsOutputToContain('   ➖  App\\:')
+            ->expectsOutputToContain('    ➖  Database\\Factories\\:')
+            ->expectsOutputToContain('    ➖  Database\\Seeders\\:')
+            ->expectsOutputToContain('    ➖  Dev\\:')
+            ->expectsOutputToContain('    ➖  routes/web.php')
             ->expectsOutputToContain('config/ (10 files)')
             ->expectsOutputToContain('database/migrations/ (2 files)')
-            ->expectsOutputToContain('references were checked, ')
+            ->expectsOutputToContain('29 references were checked, 5 errors found.')
+            ->expectsOutputToContain('🔸 2 wrong imports found.')
+            ->expectsOutputToContain('🔸 3 wrong class references found.')
+            //
+            ->expectsOutputToContain("at dev-classes{$ds}Imports.php:6")
             ->expectsOutputToContain("at dev-classes{$ds}Imports.php:7")
+            ->expectsOutputToContain("at dev-classes{$ds}Imports.php:9")
             ->expectsOutputToContain("at dev-classes{$ds}Imports.php:14")
             ->expectsOutputToContain("at dev-classes{$ds}Imports.php:15")
+            ->expectsOutputToContain("at dev-classes{$ds}Imports.php:16")
+            ->expectsOutputToContain("at dev-classes{$ds}Imports.php:17")
+            //
+            ->expectsOutputToContain("App\Models\User@hello")
+            ->expectsOutputToContain("'App\\Models\\User2@hello'")
             ->expectsOutputToContain('App\User')
             ->expectsOutputToContain('App3')
-            ->expectsOutputToContain('\Wrong')
             ->expectsOutputToContain('use App2;')
+            ->expectsOutputToContain('use App4;')
+            ->expectsOutputToContain('\Wrong')
+            //
+            ->expectsOutputToContain('1 Class does not exist:')
+            ->expectsOutputToContain('2 Inline class Ref does not exist:')
+            ->expectsOutputToContain('3 Inline class Ref does not exist:')
+            ->expectsOutputToContain('4 Unused & wrong import:')
+            ->expectsOutputToContain('5 Unused & wrong import:')
+            ->expectsOutputToContain('6 Class does not exist:')
+            ->expectsOutputToContain('7 Method does not exist:')
             ->run();
 
         $this->assertEquals(1, $status);
+    }
+
+    public function test_3()
+    {
+        $mainPath = app_path('Models/stringy.php');
+        copy(__DIR__.'/CheckStringyClassStubs/init-3.stub', $mainPath);
+
+        $r = $this->artisan('check:imports')->run();
+        $actual = file_get_contents($mainPath);
+        @unlink($mainPath);
+
+        $this->assertEquals(
+            file_get_contents(__DIR__.'/CheckStringyClassStubs/expect-3.stub'),
+            $actual
+        );
+
+        $this->assertEquals(1, $r);
     }
 
     protected function createTestFiles(): void

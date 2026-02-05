@@ -31,7 +31,7 @@ class SearchReplaceCommandTest extends TestCase
         $this->artisan('search_replace')
             ->assertFailed()
             ->expectsOutputToContain('Matched Code: protected function casts(): array')
-            ->expectsOutputToContain('at app'.$ds.'Models'.$ds.'User.php:41')
+            ->expectsOutputToContain('at app'.$ds.'Models'.$ds.'User.php:24')
             ->run();
     }
 

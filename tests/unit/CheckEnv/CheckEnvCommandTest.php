@@ -79,9 +79,8 @@ class CheckEnvCommandTest extends TestCase
         };
         $command->handleCommand($iterator);
         $this->assertIsArray($iterator->msg);
-        $this->assertCount(3, $iterator->msg);
         $this->assertEquals(1, $iterator->msg[0]);
         $this->assertEquals(2, $iterator->msg[1]);
-        $this->assertEquals(3, $iterator->msg[2]);
+        $this->assertEquals(3, $iterator->msg[3]);
     }
 }

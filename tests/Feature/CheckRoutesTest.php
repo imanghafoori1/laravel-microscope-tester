@@ -7,9 +7,11 @@ class CheckRoutesTest extends TestCase
 {
     public function setUp(): void
     {
+        Color::$color = false;
         $_SERVER['argv_original_1'] = $_SERVER['argv'][1];
         $_SERVER['argv'][1] = 'check:routes';
         parent::setUp();
+        copy(__DIR__.'/CheckRoutesStub/init.stub', $this->tmpFileUnderTest());
     }
 
     public function tearDown(): void
@@ -22,9 +24,6 @@ class CheckRoutesTest extends TestCase
 
     public function test()
     {
-        Color::$color = false;
-        copy(__DIR__.'/CheckRoutesStub/init.stub', $this->tmpFileUnderTest());
-
         Route::get('/w', 'App\Http\Controllers\HomeController@index');
         Route::get('/w2', 'App\ABC@index');
         Route::get('/w3', 'App\ABC@F');
@@ -34,24 +33,24 @@ class CheckRoutesTest extends TestCase
         Route::group(['namespace' => 'a', 'middlewares' => 'a'], function () {
 
         });
-
-        $r = $this->artisan('check:routes')
+        $ds = DIRECTORY_SEPARATOR;
+        $exitCode = $this->artisan('check:routes')
             ->expectsOutputToContain('The controller can not be resolved: (url: "w")')
             ->expectsOutputToContain('App\Http\Controllers\HomeController')
-            ->expectsOutputToContain('app'.DIRECTORY_SEPARATOR.'ABC.php')
-            ->expectsOutputToContain('route name does not exist:')
+            ->expectsOutputToContain('app'.$ds.'ABC.php')
+            ->expectsOutputToContain('Route name does not exist:')
             ->expectsOutputToContain('1 route(...) calls were checked. (1 skipped)')
-            ->expectsOutputToContain('route(\'sss\')  <=== is wrong')
+            ->expectsOutputToContain("route('sss')  <=== is wrong")
             ->expectsOutputToContain('App\ABC')
             ->expectsOutputToContain('Absent method for route url: "w2"')
             ->expectsOutputToContain('is overridden by an other route with same uri.')
-            ->expectsOutputToContain('2 Incorrect \'middlewares\' key.')
+            ->expectsOutputToContain("2 Incorrect 'middlewares' key.")
             ->expectsOutputToContain('Route with uri: GET,HEAD: /w4 is overridden.')
-            ->expectsOutputToContain('[\'middlewares\' => ...] key passed to Route::group(...) is not correct.')
-            ->expectsOutputToContain('at tests\Feature\CheckRoutesTest.php:34')
+            ->expectsOutputToContain("['middlewares' => ...] key passed to Route::group(...) is not correct.")
+            ->expectsOutputToContain("at tests{$ds}Feature{$ds}CheckRoutesTest.php:33")
             ->run();
 
-        $this->assertEquals(1, $r);
+        $this->assertEquals(1, $exitCode);
     }
 
     private function tmpFileUnderTest()
