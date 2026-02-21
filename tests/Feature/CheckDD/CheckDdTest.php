@@ -33,7 +33,7 @@ class CheckDdTest extends TestCase
             ->expectsOutput("   4| dump('sss');")
             ->expectsOutput('at routes'.DIRECTORY_SEPARATOR.'web2.php:4')
             //
-            ->expectsOutput("   2 Debug function found: 'dd'")
+            ->expectsOutput("   2 Debug function found: 'DD'")
             ->expectsOutput("   8| DD('sfvsf');")
             ->expectsOutput('at app'.DIRECTORY_SEPARATOR.'dd.php:8')
             //

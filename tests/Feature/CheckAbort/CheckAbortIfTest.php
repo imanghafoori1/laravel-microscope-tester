@@ -3,11 +3,13 @@
 use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Support\Facades\File;
 use Imanghafoori\LaravelMicroscope\Foundations\Color;
+use Imanghafoori\LaravelMicroscope\Foundations\Console;
 
 class CheckAbortIfTest extends TestCase
 {
     public function tearDown(): void
     {
+        Console::reset();
         Color::$color = true;
         File::deleteDirectory($this->cachePath(), true);
         @unlink($this->tmpFileUnderTest());
@@ -20,7 +22,9 @@ class CheckAbortIfTest extends TestCase
         copy(__DIR__.'/CheckAbortIfStubs/init.stub', $this->tmpFileUnderTest());
 
         $question = 'Do you want to replace abort_if.php with new version of it?';
-        $r = $this->artisan('check:abort_if')->expectsQuestion($question, true)->run();
+        Console::fakeAnswer($question);
+
+        $r = $this->artisan('check:abort_if')->run();
 
         $this->assertEquals(1, 1);
         $this->assertEquals(

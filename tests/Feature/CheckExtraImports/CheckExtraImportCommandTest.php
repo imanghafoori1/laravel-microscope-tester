@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Support\Facades\File;
+use Imanghafoori\LaravelMicroscope\Features\SearchReplace\CachedFiles;
 use Imanghafoori\LaravelMicroscope\Foundations\Color;
 use PHPUnit\Framework\Attributes\Test;
 
@@ -18,6 +19,7 @@ class CheckExtraImportCommandTest extends TestCase
         parent::setUp();
 
         Color::$color = false;
+        @unlink($this->getCacheFilePath());
         @mkdir(base_path('dev-classes'));
         copy(
             __DIR__.'/CheckExtraImportsStubs/imports.stub',
@@ -27,6 +29,7 @@ class CheckExtraImportCommandTest extends TestCase
 
     protected function tearDown(): void
     {
+        @unlink($this->getCacheFilePath());
         Color::$color = true;
         @unlink(base_path('dev-classes/Imports.php'));
         @rmdir(base_path('dev-classes'));
@@ -85,6 +88,7 @@ class CheckExtraImportCommandTest extends TestCase
             ->run();
 
         $this->assertEquals(1, $status);
+        $this->assertFileExists($this->getCacheFilePath());
     }
 
     #[Test]
@@ -106,5 +110,10 @@ class CheckExtraImportCommandTest extends TestCase
         File::put($this->testDirectory.'/SubDir/TestClassWithoutNamespace.php', $content1);
 
         copy(__DIR__.'/Psr4Tests/initial/OldRef.stub', app_path('Models/Ref.php'));
+    }
+
+    private function getCacheFilePath()
+    {
+        return CachedFiles::getFolderPath().'check_extra_imports.php';
     }
 }

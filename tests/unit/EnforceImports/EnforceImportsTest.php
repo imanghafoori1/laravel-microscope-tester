@@ -20,8 +20,7 @@ class EnforceImportsTest extends TestCase
 
     public function testFixFile()
     {
-        EnforceImports::setOptions(false, 'U3', function ($err) {
-        });
+        EnforceImports::setOptions(false, 'U3');
         $result = EnforceImports::performCheck(
             PhpFileDescriptor::make(__DIR__.DIRECTORY_SEPARATOR.'imports.temp')
         );

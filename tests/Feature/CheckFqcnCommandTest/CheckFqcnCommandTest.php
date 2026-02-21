@@ -2,13 +2,15 @@
 
 use Illuminate\Foundation\Testing\TestCase;
 use Imanghafoori\LaravelMicroscope\ErrorReporters\ErrorPrinter;
+use Imanghafoori\LaravelMicroscope\Features\SearchReplace\CachedFiles;
 
 class CheckFqcnCommandTest extends TestCase
 {
     public function tearDown(): void
     {
+        @unlink($this->getCacheFilePath());
         ErrorPrinter::$ignored = [];
-        unlink($this->tmpFileUnderTest());
+        @unlink($this->tmpFileUnderTest());
         @unlink(app_path('Fqcn2.php'));
         parent::tearDown();
     }
@@ -35,6 +37,8 @@ class CheckFqcnCommandTest extends TestCase
             file_get_contents(__DIR__.'/CheckFqcn/expected.stub'),
             file_get_contents($this->tmpFileUnderTest())
         );
+
+        $this->assertFileExists($this->getCacheFilePath());
     }
 
     public function test_no_fix()
@@ -68,5 +72,10 @@ class CheckFqcnCommandTest extends TestCase
     private function tmpFileUnderTest(): string
     {
         return app_path('Fqcn.php');
+    }
+
+    private function getCacheFilePath()
+    {
+        return CachedFiles::getFolderPath().'extra_fqcn.php';
     }
 }

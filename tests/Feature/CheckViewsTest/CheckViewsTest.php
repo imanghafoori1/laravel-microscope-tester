@@ -23,6 +23,7 @@ class CheckViewsTest extends TestCase
     {
         @unlink($this->tmpFileUnderTest());
         @unlink($this->bladePath());
+        @unlink($this->getCacheFilePath());
         @rmdir(resource_path('views'));
         @rmdir(resource_path());
         CheckView::$cache = true;
@@ -34,7 +35,7 @@ class CheckViewsTest extends TestCase
     {
         $ds = DIRECTORY_SEPARATOR;
         $r = $this->artisan('check:views')
-            ->expectsOutputToContain('5 view references were checked to exist. (1 skipped)')
+            ->expectsOutputToContain('6 view references were checked to exist. (1 skipped)')
             ->expectsOutputToContain('at app'.$ds.'Views.php:11')
             ->expectsOutputToContain('at app'.$ds.'Views.php:12')
             ->expectsOutputToContain('at app'.$ds.'Views.php:13')

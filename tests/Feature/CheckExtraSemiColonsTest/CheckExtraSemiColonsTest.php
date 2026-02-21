@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Testing\TestCase;
 use Imanghafoori\LaravelMicroscope\Foundations\Color;
+use Imanghafoori\LaravelMicroscope\Foundations\Console;
 
 class CheckExtraSemiColonsTest extends TestCase
 {
@@ -13,6 +14,7 @@ class CheckExtraSemiColonsTest extends TestCase
 
     public function tearDown(): void
     {
+        Console::reset();
         Color::$color = true;
         @unlink($this->tmpFileUnderTest());
         parent::tearDown();
@@ -22,9 +24,17 @@ class CheckExtraSemiColonsTest extends TestCase
     {
         copy(__DIR__.'/CheckExtraSemiColonStubs/init.stub', $this->tmpFileUnderTest());
 
-        $r = $this->artisan('check:extra_semi_colons')
-            ->expectsQuestion('Do you want to replace extra_semi_colons.php with new version of it?', 'yes')
-            ->run();
+        Console::enforceTrue();
+
+        $r = $this->artisan('check:extra_semi_colons')->run();
+
+        ;
+        $this->assertEquals([
+            'Do you want to replace extra_semi_colons.php with new version of it?',
+            'Do you want to replace extra_semi_colons.php with new version of it?',
+            'Do you want to replace extra_semi_colons.php with new version of it?',
+            'Do you want to replace extra_semi_colons.php with new version of it?',
+        ], Console::$askedConfirmations);
 
         $this->assertEquals(1, $r);
 

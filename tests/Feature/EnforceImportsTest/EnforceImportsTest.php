@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\TestCase;
+use Imanghafoori\LaravelMicroscope\Features\SearchReplace\CachedFiles;
 
 class EnforceImportsTest extends TestCase
 {
@@ -12,6 +13,7 @@ class EnforceImportsTest extends TestCase
 
     public function tearDown(): void
     {
+        @unlink($this->getCacheFilePath());
         @unlink($this->tmpFileUnderTest());
         parent::tearDown();
     }
@@ -41,5 +43,10 @@ class EnforceImportsTest extends TestCase
     private function tmpFileUnderTest()
     {
         return app_path('EnforceImports.php');
+    }
+
+    private function getCacheFilePath()
+    {
+        return CachedFiles::getFolderPath().'EnforceImports.php';
     }
 }

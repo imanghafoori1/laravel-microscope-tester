@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Testing\TestCase;
 use Imanghafoori\LaravelMicroscope\Features\EnforceImports\EnforceImports;
 use Imanghafoori\LaravelMicroscope\Foundations\Color;
+use Imanghafoori\LaravelMicroscope\Foundations\Console;
 
 class EnforceQueryTest extends TestCase
 {
@@ -17,14 +18,19 @@ class EnforceQueryTest extends TestCase
     {
         Color::$color = EnforceImports::$cache = true;
         @unlink($this->tmpFileUnderTest());
+        Console::reset();
         parent::tearDown();
     }
 
     public function test()
     {
-        $r = $this->artisan('enforce:query')
-            ->expectsQuestion('Do you want to replace Query.php with new version of it?', 'yes')
-            ->run();
+        Console::enforceTrue();
+        $r = $this->artisan('enforce:query')->run();
+
+        $this->assertEquals([
+            'Do you want to replace Query.php with new version of it?',
+            'Do you want to replace Query.php with new version of it?',
+        ], Console::$askedConfirmations);
 
         $this->assertEquals(
             file_get_contents(__DIR__.'/EnforceQueryStub/enforce-query-final.stub'),

@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Testing\TestCase;
 use Imanghafoori\LaravelMicroscope\Foundations\Color;
+use Imanghafoori\LaravelMicroscope\Foundations\Console;
 use Imanghafoori\LaravelMicroscope\LaravelPaths\LaravelPaths;
 
 class CheckMigrationTest extends TestCase
@@ -16,6 +17,7 @@ class CheckMigrationTest extends TestCase
 
     public function tearDown(): void
     {
+        Console::reset();
         Color::$color = true;
         LaravelPaths::$migrationDirs = [];
         @rmdir(database_path('migrations2'));
@@ -29,12 +31,14 @@ class CheckMigrationTest extends TestCase
         LaravelPaths::$migrationDirs[] = base_path('vendor/imanghafoori');
         LaravelPaths::$migrationDirs[] = database_path('migrations2');
 
-        $r = $this->artisan('check:migrations')
-            ->expectsQuestion('Do you want to replace 0001_01_01_000002_create_posts_table.php with new version of it?', 'yes')
-            ->run();
+        Console::enforceTrue();
+        $r = $this->artisan('check:migrations')->run();
 
         $this->assertIsInt($r);
 
+        $this->assertEquals([
+            'Do you want to replace 0001_01_01_000002_create_posts_table.php with new version of it?'
+        ], Console::$askedConfirmations);
         $this->assertEquals(
             file_get_contents(__DIR__.'/CheckMigrationStubs/expected.stub'),
             file_get_contents($this->tmpFileUnderTest())

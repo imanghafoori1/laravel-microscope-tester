@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Testing\TestCase;
 use Imanghafoori\LaravelMicroscope\Features\CheckEndIf\CheckEndIfSyntax;
 use Imanghafoori\LaravelMicroscope\Foundations\Color;
+use Imanghafoori\LaravelMicroscope\Foundations\Console;
 
 class CheckEndIfTest extends TestCase
 {
@@ -15,6 +16,7 @@ class CheckEndIfTest extends TestCase
 
     public function tearDown(): void
     {
+        Console::reset();
         Color::$color = CheckEndIfSyntax::$cache = true;
         @unlink($this->tmpFileUnderTest());
         parent::tearDown();
@@ -22,10 +24,13 @@ class CheckEndIfTest extends TestCase
 
     public function test()
     {
-        $r = $this->artisan('check:endif')
-            ->expectsQuestion('Do you have committed everything in git?', true)
-            ->expectsQuestion('Replacing endif in: app'.DIRECTORY_SEPARATOR.'endIf.php', 'yes')
-            ->run();
+        Console::enforceTrue();
+        $r = $this->artisan('check:endif')->run();
+
+        $this->assertEquals([
+            'Do you have committed everything in git?',
+            'Replacing endif in: app'.DIRECTORY_SEPARATOR.'endIf.php',
+        ], Console::$askedConfirmations);
 
         $this->assertEquals(0, $r);
         $this->assertEquals(

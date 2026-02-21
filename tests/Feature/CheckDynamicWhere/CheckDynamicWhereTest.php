@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Testing\TestCase;
 use Imanghafoori\LaravelMicroscope\Foundations\Color;
+use Imanghafoori\LaravelMicroscope\Foundations\Console;
 
 class CheckDynamicWhereTest extends TestCase
 {
@@ -13,6 +14,7 @@ class CheckDynamicWhereTest extends TestCase
 
     public function tearDown(): void
     {
+        Console::reset();
         Color::$color = true;
         @unlink($this->tmpFileUnderTest());
         parent::tearDown();
@@ -22,9 +24,13 @@ class CheckDynamicWhereTest extends TestCase
     {
         copy(__DIR__.'/DynamicWhereStubs/dynamic-where-init.stub', $this->tmpFileUnderTest());
 
-        $r = $this->artisan('check:dynamic_wheres')
-            ->expectsConfirmation('Do you want to replace dynamic_wheres.php with new version of it?', 'yes')
-            ->run();
+        Console::enforceTrue();
+        $r = $this->artisan('check:dynamic_wheres')->run();
+
+        $this->assertEquals([
+            'Do you want to replace dynamic_wheres.php with new version of it?',
+            'Do you want to replace dynamic_wheres.php with new version of it?',
+        ], Console::$askedConfirmations);
 
         $this->assertEquals(1, $r);
 

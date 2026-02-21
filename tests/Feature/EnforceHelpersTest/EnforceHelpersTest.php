@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Testing\TestCase;
 use Imanghafoori\LaravelMicroscope\Foundations\Color;
+use Imanghafoori\LaravelMicroscope\Foundations\Console;
 
 class EnforceHelpersTest extends TestCase
 {
@@ -14,6 +15,7 @@ class EnforceHelpersTest extends TestCase
 
     public function tearDown(): void
     {
+        Console::reset();
         Color::$color = true;
         @unlink($this->tmpFileUnderTest());
         parent::tearDown();
@@ -21,10 +23,15 @@ class EnforceHelpersTest extends TestCase
 
     public function test()
     {
-        $r = $this->artisan('enforce:helper_functions')
-            ->expectsQuestion('Do you want to replace Helper.php with new version of it?', true)
-            ->run();
+        Console::enforceTrue();
 
+        $r = $this->artisan('enforce:helper_functions')->run();
+        $this->assertEquals([
+            'Do you want to replace Helper.php with new version of it?',
+            'Do you want to replace Helper.php with new version of it?',
+            'Do you want to replace Helper.php with new version of it?',
+            'Do you want to replace Helper.php with new version of it?',
+        ], Console::$askedConfirmations);
         $this->assertEquals(1, $r);
 
         $this->assertEquals(

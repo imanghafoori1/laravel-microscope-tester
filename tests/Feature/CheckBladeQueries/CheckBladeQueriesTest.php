@@ -28,11 +28,17 @@ class CheckBladeQueriesTest extends TestCase
         $ds = DIRECTORY_SEPARATOR;
         $r = $this->artisan('check:blade_queries')
             // --------------------------------========-------------------------------- //
-            ->expectsOutputToContain('   1 Query in blade file: ')->expectsOutputToContain('   \App\Models\User  <=== DB query in blade file')->expectsOutputToContain("at resources{$ds}views{$ds}blade_queries.blade.php:4")
+            ->expectsOutputToContain('   1 Query in blade file: ')
+            ->expectsOutputToContain('   \App\Models\User  <=== DB query in blade file')
+            ->expectsOutputToContain("at resources{$ds}views{$ds}blade_queries.blade.php:4")
             // --------------------------------========-------------------------------- //
-            ->expectsOutput('   2 Query in blade file: ')->expectsOutput('   \DB  <=== DB query in blade file')->expectsOutput("at resources{$ds}views{$ds}blade_queries.blade.php:5")
+            ->expectsOutput('   2 Query in blade file: ')
+            ->expectsOutput('   \DB  <=== DB query in blade file')
+            ->expectsOutput("at resources{$ds}views{$ds}blade_queries.blade.php:5")
             // --------------------------------========-------------------------------- //
-            ->expectsOutput('   3 Query in blade file: ')->expectsOutput('   DB  <=== DB query in blade file')->expectsOutput("at resources{$ds}views{$ds}blade_queries.blade.php:6")
+            ->expectsOutput('   3 Query in blade file: ')
+            ->expectsOutput('   DB  <=== DB query in blade file')
+            ->expectsOutput("at resources{$ds}views{$ds}blade_queries.blade.php:6")
             // --------------------------------========-------------------------------- //
             ->run();
 

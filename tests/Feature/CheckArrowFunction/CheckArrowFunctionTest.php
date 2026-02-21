@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Testing\TestCase;
 use Imanghafoori\LaravelMicroscope\Foundations\Color;
+use Imanghafoori\LaravelMicroscope\Foundations\Console;
 
 class CheckArrowFunctionTest extends TestCase
 {
@@ -13,6 +14,7 @@ class CheckArrowFunctionTest extends TestCase
 
     public function tearDown(): void
     {
+        Console::reset();
         Color::$color = true;
         @unlink($this->tmpFileUnderTest());
         parent::tearDown();
@@ -22,9 +24,15 @@ class CheckArrowFunctionTest extends TestCase
     {
         copy(__DIR__.'/CheckArrowFunctionStub/init.stub', $this->tmpFileUnderTest());
 
-        $r = $this->artisan('check:arrow_functions')
-            ->expectsQuestion('Do you want to replace arrow.php with new version of it?', 'yes')
-            ->run();
+        Console::enforceTrue();
+
+        $r = $this->artisan('check:arrow_functions')->run();
+
+        $this->assertEquals([
+            'Do you want to replace arrow.php with new version of it?',
+            'Do you want to replace arrow.php with new version of it?',
+            'Do you want to replace arrow.php with new version of it?',
+        ], Console::$askedConfirmations);
 
         $this->assertEquals(1, $r);
 

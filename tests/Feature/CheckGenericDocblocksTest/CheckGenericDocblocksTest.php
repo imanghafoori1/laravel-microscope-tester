@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Testing\TestCase;
 use Imanghafoori\LaravelMicroscope\Foundations\Color;
+use Imanghafoori\LaravelMicroscope\Foundations\Console;
 
 class CheckGenericDocblocksTest extends TestCase
 {
@@ -14,6 +15,7 @@ class CheckGenericDocblocksTest extends TestCase
 
     public function tearDown(): void
     {
+        Console::reset();
         Color::$color = true;
         @unlink($this->tmpFileUnderTest());
         parent::tearDown();
@@ -21,10 +23,15 @@ class CheckGenericDocblocksTest extends TestCase
 
     public function test()
     {
+        Console::enforceTrue();
+
         $r = $this->artisan('check:generic_docblocks')
-            ->expectsConfirmation('Do you want to remove doc-blocks from: HelloController.php', 'yes')
             ->expectsOutputToContain('7 generic doc-blocks were found.')
             ->run();
+
+        $this->assertEquals([
+            'Do you want to remove doc-blocks from: HelloController.php'
+        ], Console::$askedConfirmations);
 
         $this->assertEquals(
             file_get_contents(__DIR__.'/CheckGenericDocblocksStubs/expected.stub'),

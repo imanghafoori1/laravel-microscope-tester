@@ -3,9 +3,9 @@
 use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Support\Composer;
 use Illuminate\Support\Facades\File;
-use Imanghafoori\LaravelMicroscope\Features\Psr4\Console\AskAndFixNamespace;
 use Imanghafoori\LaravelMicroscope\Features\Psr4\Console\NamespaceFixer\NamespaceFixerMessages;
 use Imanghafoori\LaravelMicroscope\Foundations\Color;
+use Imanghafoori\LaravelMicroscope\Foundations\Console;
 use PHPUnit\Framework\Attributes\Test;
 
 class FixNamespaceCommandTest extends TestCase
@@ -47,6 +47,7 @@ class FixNamespaceCommandTest extends TestCase
         // Clean up after tests
         $this->cleanUpTestDirectory();
         file_put_contents(base_path('composer.json'), self::$composerJson);
+        Console::reset();
 
         parent::tearDown();
     }
@@ -58,7 +59,7 @@ class FixNamespaceCommandTest extends TestCase
         $this->createTestFiles();
         $this->mock(Composer::class)->shouldReceive('dumpAutoloads')->once();
         NamespaceFixerMessages::$pause = 20;
-        AskAndFixNamespace::$pause = 70;
+        Console::$pause = 70;
 
         $this->artisan('check:psr4 --nofix')
             ->expectsOutputToContain("The file name and the class name are different.")
@@ -75,14 +76,12 @@ class FixNamespaceCommandTest extends TestCase
         $this->createTestFiles();
         $this->mock(Composer::class)->shouldReceive('dumpAutoloads')->once();
         NamespaceFixerMessages::$pause = 0;
-        AskAndFixNamespace::$pause = 0;
+        Console::$pause = 0;
+
+        Console::enforceTrue();
+
         // Run the artisan command on our test directory
         $this->artisan('check:psr4')
-            ->expectsConfirmation("Do you want to change it to: Models", 'yes')
-            ->expectsConfirmation("Do you want to update reference to the old namespace?", 'yes')
-            ->expectsConfirmation("Do you want to change it to: App\TestNamespaceFixer\SubDir", 'yes')
-            ->expectsConfirmation("Do you want to change it to: App\TestNamespaceFixer", 'yes')
-            ->expectsConfirmation("Do you want to change it to: App\TestNamespaceFixer", 'yes')
             ->expectsOutputToContain('Namespace Not Found for class: TestClassWithoutNamespace')
             ->expectsOutputToContain('Namespace Not Found for class: TestClassDeclareWithoutNamespace')
             ->expectsOutputToContain('Namespace of class "TestClassWithoutNamespace" fixed to:')
@@ -92,6 +91,15 @@ class FixNamespaceCommandTest extends TestCase
             ->expectsOutputToContain('Incorrect namespace: \'Wrong\Namespace\'')
             ->expectsOutputToContain('The file name and the class name are different.')
             ->run();
+
+        $expected = [
+            'Do you want to change it to: Models',
+            'Do you want to update reference to the old namespace?',
+            'Do you want to change it to: App\TestNamespaceFixer\SubDir',
+            'Do you want to change it to: App\TestNamespaceFixer',
+            'Do you want to change it to: App\TestNamespaceFixer',
+        ];
+        $this->assertEquals($expected, Console::$askedConfirmations);
         // Check output contains expected messages
         $this->assertEquals(
             $this->getFileContent(__DIR__.'/Psr4Tests/expected_results/TestClassWithoutNamespace.stub'),

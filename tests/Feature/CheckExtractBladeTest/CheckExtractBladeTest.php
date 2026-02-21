@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\TestCase;
+use Imanghafoori\LaravelMicroscope\Foundations\Console;
 
 class CheckExtractBladeTest extends TestCase
 {
@@ -15,6 +16,7 @@ class CheckExtractBladeTest extends TestCase
 
     public function tearDown(): void
     {
+        Console::reset();
         @unlink(resource_path('ns/myPartials/body.blade.php'));
         @unlink(resource_path('views/myPartials/head.blade.php'));
         @unlink(resource_path('views/hello.blade.php'));
@@ -29,10 +31,10 @@ class CheckExtractBladeTest extends TestCase
 
     public function test()
     {
+        Console::enforceTrue();
+
         View::addNamespace('ns', resource_path('ns'));
-        $r = $this->artisan('check:extract_blades')
-            ->expectsQuestion('Do you have committed everything in git?', true)
-            ->run();
+        $r = $this->artisan('check:extract_blades')->run();
 
         $this->assertEquals(
             file_get_contents(__DIR__.'/ExtractBladeStubs/expected.stub'),
@@ -46,6 +48,10 @@ class CheckExtractBladeTest extends TestCase
             file_get_contents(__DIR__.'/ExtractBladeStubs/body.stub'),
             file_get_contents(resource_path('ns/myPartials/body.blade.php'))
         );
+
+        $this->assertEquals([
+            'Do you have committed everything in git?'
+        ], Console::$askedConfirmations);
 
         $this->assertEquals(0, $r);
     }
