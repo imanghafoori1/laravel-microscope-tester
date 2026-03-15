@@ -8,15 +8,18 @@ class CheckExtraSemiColonsTest extends TestCase
 {
     public function setUp(): void
     {
-        Color::$color = false;
         parent::setUp();
+
+        Console::enforceTrue();
+        Console::recoredWrites();
+        Color::$color = false;
     }
 
     public function tearDown(): void
     {
         Console::reset();
-        Color::$color = true;
         @unlink($this->tmpFileUnderTest());
+
         parent::tearDown();
     }
 
@@ -24,11 +27,9 @@ class CheckExtraSemiColonsTest extends TestCase
     {
         copy(__DIR__.'/CheckExtraSemiColonStubs/init.stub', $this->tmpFileUnderTest());
 
-        Console::enforceTrue();
-
-        $r = $this->artisan('check:extra_semi_colons')->run();
-
-        ;
+        $r = $this->artisan('check:extra_semi_colons')
+            ->assertFailed()
+            ->run();
         $this->assertEquals([
             'Do you want to replace extra_semi_colons.php with new version of it?',
             'Do you want to replace extra_semi_colons.php with new version of it?',
@@ -36,12 +37,22 @@ class CheckExtraSemiColonsTest extends TestCase
             'Do you want to replace extra_semi_colons.php with new version of it?',
         ], Console::$askedConfirmations);
 
-        $this->assertEquals(1, $r);
-
-        $this->assertEquals(
-            file_get_contents(__DIR__.'/CheckExtraSemiColonStubs/expected.stub'),
-            file_get_contents($this->tmpFileUnderTest())
+        $this->assertFileEquals(
+            __DIR__.'/CheckExtraSemiColonStubs/expected.stub',
+            $this->tmpFileUnderTest()
         );
+
+        $cachePath = storage_path('framework/cache/microscope/extra_semi_colons-v1.php');
+        $this->assertFileExists($cachePath);
+        $content = require $cachePath;
+        $this->assertIsArray($content);
+        $this->assertTrue(in_array('helpers.php', $content));
+        $this->assertTrue(in_array('a.php', $content));
+        $this->assertTrue(in_array('web.php', $content));
+        $this->assertTrue(in_array('UserFactory.php', $content));
+        $this->assertTrue(in_array('DatabaseSeeder.php', $content));
+
+        @unlink($cachePath);
     }
 
     private function tmpFileUnderTest()

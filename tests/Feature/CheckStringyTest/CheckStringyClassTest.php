@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\TestCase;
+use Imanghafoori\LaravelMicroscope\ErrorReporters\ErrorPrinter;
 use Imanghafoori\LaravelMicroscope\Features\CheckDD\CheckDD;
 use Imanghafoori\LaravelMicroscope\Features\SearchReplace\CachedFiles;
 use Imanghafoori\LaravelMicroscope\Foundations\Color;
@@ -10,33 +11,19 @@ class CheckStringyClassTest extends TestCase
 {
     public function setUp(): void
     {
-        Console::$instance = new class
-        {
-            public $text = [];
-
-            public $writeln = [];
-
-            public function writeln($write)
-            {
-                $this->writeln[] = $write;
-            }
-
-            public function text($text)
-            {
-                $this->text[] = $text;
-            }
-        };
+        parent::setUp();
+        Console::recoredWrites();
+        ErrorPrinter::$instance = null;
+        ErrorPrinter::$terminalWidth = 10;
 
         CheckDD::$cache = false;
         Color::$color = false;
-        parent::setUp();
     }
 
     public function tearDown(): void
     {
         Console::reset();
         CheckDD::$cache = true;
-        Color::$color = true;
         @unlink($this->tmpFileUnderTest());
         @unlink($this->getCacheFilePath());
         @unlink(app_path('Models/stringy.php'));
@@ -48,24 +35,34 @@ class CheckStringyClassTest extends TestCase
         copy(__DIR__.'/CheckStringyClassStubs/init.stub', $this->tmpFileUnderTest());
 
         Console::$forcedAnswer = false;
-        $r = $this->artisan('check:stringy_classes')->run();
-        $text = Console::$instance->text;
+        $this->artisan('check:stringy_classes')->assertFailed()->run();
+
         $write = Console::$instance->writeln;
-        $this->assertEquals([], $write);
-        $this->assertStringContainsString("3 |'App\Models\User';", $text[0]);
-        $this->assertStringContainsString("stringy.php:3", $text[1]);
-        $this->assertStringContainsString("5 |'\App\Models\User';", $text[2]);
-        $this->assertStringContainsString("stringy.php:5", $text[3]);
+        array_pop($write);
+
+        $ds = DIRECTORY_SEPARATOR;
+        $this->assertEquals([
+            PHP_EOL."3 |'App\Models\User';",
+            "at app{$ds}stringy.php:3",
+            PHP_EOL."5 |'\App\Models\User';",
+            "at app{$ds}stringy.php:5",
+            "   1 Class ''App\Models\User2'' does not exist:",
+            "   'App\Models\User2'",
+            "at app{$ds}stringy.php:4",
+            '_______',
+        ], $write);
+
+        //
         $this->assertEquals([
             "Replace: 'App\\Models\\User' with ::class version of it?",
             "Replace: '\\App\\Models\\User' with ::class version of it?",
         ], Console::$askedConfirmations);
-        $this->assertEquals(
-            file_get_contents(__DIR__.'/CheckStringyClassStubs/init.stub'),
-            file_get_contents($this->tmpFileUnderTest())
-        );
 
-        $this->assertEquals(1, $r);
+        // Ensure the file has not changed:
+        $this->assertFileEquals(
+            __DIR__.'/CheckStringyClassStubs/init.stub',
+            $this->tmpFileUnderTest()
+        );
     }
 
     public function test_1()
@@ -74,23 +71,36 @@ class CheckStringyClassTest extends TestCase
 
         Console::enforceTrue();
 
-        $r = $this->artisan('check:stringy_classes')->run();
+        $this->artisan('check:stringy_classes')->assertFailed()->run();
         $write = Console::$instance->writeln;
-        $this->assertEquals("✔ Replaced with: \App\Models\User::class", $write[0]);
-        $this->assertStringContainsString('______________', $write[1]);
-        $this->assertEquals("✔ Replaced with: \App\Models\User::class", $write[2]);
-        $this->assertStringContainsString('______________', $write[3]);
+        array_pop($write);
+
+        $ds = DIRECTORY_SEPARATOR;
+
+        $this->assertEquals([
+            0 => PHP_EOL."3 |'App\Models\User';",
+            1 => "at app{$ds}stringy.php:3",
+            2 => "✔ Replaced with: \App\Models\User::class",
+            3 => " _______",
+            4 => PHP_EOL."5 |'\App\Models\User';",
+            5 => "at app{$ds}stringy.php:5",
+            6 => "✔ Replaced with: \App\Models\User::class",
+            7 => " _______",
+            8 => "   1 Class ''App\Models\User2'' does not exist:",
+            9 => "   'App\Models\User2'",
+            10 => "at app{$ds}stringy.php:4",
+            11 => "_______",
+        ], $write);
+
         $this->assertEquals([
             "Replace: 'App\\Models\\User' with ::class version of it?",
             "Replace: '\\App\\Models\\User' with ::class version of it?",
         ], Console::$askedConfirmations);
 
-        $this->assertEquals(
-            file_get_contents(__DIR__.'/CheckStringyClassStubs/expect.stub'),
-            file_get_contents($this->tmpFileUnderTest())
+        $this->assertFileEquals(
+            __DIR__.'/CheckStringyClassStubs/expect.stub',
+            $this->tmpFileUnderTest()
         );
-
-        $this->assertEquals(1, $r);
     }
 
     public function test_2()
@@ -101,19 +111,32 @@ class CheckStringyClassTest extends TestCase
         Console::enforceTrue();
         $r = $this->artisan('check:stringy_classes')->run();
         $write = Console::$instance->writeln;
-        $this->assertEquals("✔ Replaced with: User::class", $write[0]);
-        $this->assertStringContainsString('______________', $write[1]);
-        $this->assertEquals("✔ Replaced with: User::class", $write[2]);
-        $this->assertStringContainsString('______________', $write[3]);
+        array_pop($write);
 
+        $ds = DIRECTORY_SEPARATOR;
+
+        $this->assertEquals([
+            0 => PHP_EOL."5 |'App\Models\User';",
+            1 => "at app{$ds}Models{$ds}stringy.php:5",
+            2 => "✔ Replaced with: User::class",
+            3 => " _______",
+            4 => PHP_EOL."7 |'\App\Models\User';",
+            5 => "at app{$ds}Models{$ds}stringy.php:7",
+            6 => "✔ Replaced with: User::class",
+            7 => " _______",
+            8 => "   1 Class ''App\Models\User2'' does not exist:",
+            9 => "   'App\Models\User2'",
+            10 => "at app{$ds}Models{$ds}stringy.php:6",
+            11 => "_______",
+        ], $write);
         $this->assertEquals([
             "Replace: 'App\\Models\\User' with ::class version of it?",
             "Replace: '\\App\\Models\\User' with ::class version of it?",
         ], Console::$askedConfirmations);
 
-        $this->assertEquals(
-            file_get_contents(__DIR__.'/CheckStringyClassStubs/expect-2.stub'),
-            file_get_contents($mainPath)
+        $this->assertFileEquals(
+            __DIR__.'/CheckStringyClassStubs/expect-2.stub',
+            $mainPath
         );
 
         $this->assertEquals(1, $r);

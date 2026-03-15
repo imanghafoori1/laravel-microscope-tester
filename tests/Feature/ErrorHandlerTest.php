@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Support\Composer;
 use Imanghafoori\LaravelMicroscope\ErrorReporters\ErrorPrinter;
+use Imanghafoori\LaravelMicroscope\Foundations\Console;
 use Imanghafoori\LaravelMicroscope\Foundations\Handlers\ErrorExceptionHandler;
 use Imanghafoori\LaravelMicroscope\Foundations\Loop;
 
@@ -29,6 +30,8 @@ class ErrorHandlerTest extends TestCase
         $this->assertNull(ErrorExceptionHandler::handle(new RuntimeException('vendor')));
         $this->assertEquals(1, $_SESSION['-dumpAutoloads-']);
         unset($_SESSION['-dumpAutoloads-']);
+        Console::$instance = null;
+        ErrorPrinter::$instance = null;
     }
 
     public function test_loop()

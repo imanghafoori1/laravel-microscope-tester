@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\TestCase;
+use Imanghafoori\LaravelMicroscope\ErrorReporters\ErrorPrinter;
 use Imanghafoori\LaravelMicroscope\Foundations\Color;
 use Imanghafoori\LaravelMicroscope\Foundations\Console;
 use Imanghafoori\LaravelMicroscope\LaravelPaths\LaravelPaths;
@@ -9,8 +10,11 @@ class CheckMigrationTest extends TestCase
 {
     public function setUp(): void
     {
-        Color::$color = false;
         parent::setUp();
+        Color::$color = false;
+        Console::recoredWrites();
+        ErrorPrinter::$instance = null;
+        ErrorPrinter::$terminalWidth = 10;
         @mkdir(database_path('migrations2'), 0777, true);
         copy(__DIR__.'/CheckMigrationStubs/init.stub', $this->tmpFileUnderTest());
     }
@@ -18,7 +22,6 @@ class CheckMigrationTest extends TestCase
     public function tearDown(): void
     {
         Console::reset();
-        Color::$color = true;
         LaravelPaths::$migrationDirs = [];
         @rmdir(database_path('migrations2'));
         @unlink($this->tmpFileUnderTest());
@@ -32,17 +35,17 @@ class CheckMigrationTest extends TestCase
         LaravelPaths::$migrationDirs[] = database_path('migrations2');
 
         Console::enforceTrue();
-        $r = $this->artisan('check:migrations')->run();
-
-        $this->assertIsInt($r);
+        $this->artisan('check:migrations')
+            ->assertFailed()
+            ->run();
 
         $this->assertEquals([
             'Do you want to replace 0001_01_01_000002_create_posts_table.php with new version of it?'
         ], Console::$askedConfirmations);
-        $this->assertEquals(
-            file_get_contents(__DIR__.'/CheckMigrationStubs/expected.stub'),
-            file_get_contents($this->tmpFileUnderTest())
-            );
+        $this->assertFileEquals(
+            __DIR__.'/CheckMigrationStubs/expected.stub',
+            $this->tmpFileUnderTest()
+        );
     }
 
     private function tmpFileUnderTest()

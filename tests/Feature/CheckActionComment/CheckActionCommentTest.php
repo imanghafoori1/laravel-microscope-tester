@@ -10,17 +10,17 @@ class CheckActionCommentTest extends TestCase
 {
     public function setUp(): void
     {
-        Console::reset();
-
-        Color::$color = false;
         parent::setUp();
+
+        Console::recoredWrites();
+        Color::$color = false;
     }
 
     public function tearDown(): void
     {
         Console::reset();
-        Color::$color = true;
         @unlink($this->tmpFileUnderTest());
+
         parent::tearDown();
     }
 
@@ -38,9 +38,9 @@ class CheckActionCommentTest extends TestCase
             'Add route definition into the: App\MyController'
         ], Console::$askedConfirmations);
 
-        $this->assertEquals(
-            file_get_contents(__DIR__.'/CheckActionCommentStubs/expected.stub'),
-            file_get_contents($this->tmpFileUnderTest())
+        $this->assertFileEquals(
+            __DIR__.'/CheckActionCommentStubs/expected.stub',
+            $this->tmpFileUnderTest()
         );
     }
 
@@ -60,9 +60,9 @@ class CheckActionCommentTest extends TestCase
             Console::$askedConfirmations
         );
 
-        $this->assertEquals(
-            file_get_contents(__DIR__.'/CheckActionCommentStubs/expected.stub'),
-            file_get_contents($this->tmpFileUnderTest())
+        $this->assertFileEquals(
+            __DIR__.'/CheckActionCommentStubs/expected.stub',
+            $this->tmpFileUnderTest()
         );
     }
 

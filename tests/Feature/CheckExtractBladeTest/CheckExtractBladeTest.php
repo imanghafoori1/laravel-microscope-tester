@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\TestCase;
+use Imanghafoori\LaravelMicroscope\Foundations\Color;
 use Imanghafoori\LaravelMicroscope\Foundations\Console;
 
 class CheckExtractBladeTest extends TestCase
@@ -8,6 +9,9 @@ class CheckExtractBladeTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        Color::$color = false;
+        Console::recoredWrites();
         @mkdir(resource_path());
         @mkdir(resource_path('ns'));
         @mkdir($this->views());
@@ -26,6 +30,7 @@ class CheckExtractBladeTest extends TestCase
         @rmdir(resource_path('ns'));
         @rmdir(resource_path());
         @unlink($this->tmpFileUnderTest());
+
         parent::tearDown();
     }
 
@@ -34,26 +39,24 @@ class CheckExtractBladeTest extends TestCase
         Console::enforceTrue();
 
         View::addNamespace('ns', resource_path('ns'));
-        $r = $this->artisan('check:extract_blades')->run();
+        $this->artisan('check:extract_blades')->assertOk()->run();
 
-        $this->assertEquals(
-            file_get_contents(__DIR__.'/ExtractBladeStubs/expected.stub'),
-            file_get_contents(resource_path('views/hello.blade.php'))
+        $this->assertFileEquals(
+            __DIR__.'/ExtractBladeStubs/expected.stub',
+            resource_path('views/hello.blade.php')
         );
-        $this->assertEquals(
-            file_get_contents(__DIR__.'/ExtractBladeStubs/head.stub'),
-            file_get_contents(resource_path('views/myPartials/head.blade.php'))
+        $this->assertFileEquals(
+            __DIR__.'/ExtractBladeStubs/head.stub',
+            resource_path('views/myPartials/head.blade.php')
         );
-        $this->assertEquals(
-            file_get_contents(__DIR__.'/ExtractBladeStubs/body.stub'),
-            file_get_contents(resource_path('ns/myPartials/body.blade.php'))
+        $this->assertFileEquals(
+            __DIR__.'/ExtractBladeStubs/body.stub',
+            resource_path('ns/myPartials/body.blade.php')
         );
 
         $this->assertEquals([
             'Do you have committed everything in git?'
         ], Console::$askedConfirmations);
-
-        $this->assertEquals(0, $r);
     }
 
     private function tmpFileUnderTest()

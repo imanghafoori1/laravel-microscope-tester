@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\TestCase;
+use Imanghafoori\LaravelMicroscope\ErrorReporters\ErrorPrinter;
 use Imanghafoori\LaravelMicroscope\Foundations\Color;
 use Imanghafoori\LaravelMicroscope\Foundations\Console;
 
@@ -10,15 +11,8 @@ class CheckEarlyTest extends TestCase
     {
         parent::setUp();
         Color::$color = false;
-        Console::$instance = new class
-        {
-            public $writeln = [];
-
-            public function writeln($write)
-            {
-                $this->writeln[] = $write;
-            }
-        };
+        ErrorPrinter::$terminalWidth = 10;
+        Console::recoredWrites();
         copy(__DIR__.'/CheckEarlyStubs/init.stub', $this->tmpFileUnderTest());
     }
 
@@ -26,7 +20,6 @@ class CheckEarlyTest extends TestCase
     {
         Console::reset();
         @unlink($this->tmpFileUnderTest());
-        Color::$color = true;
         parent::tearDown();
     }
 
@@ -34,27 +27,31 @@ class CheckEarlyTest extends TestCase
     {
         Console::enforceTrue();
 
-        $r = $this->artisan('check:early_returns')
+        $this->artisan('check:early_returns')
             ->expectsOutputToContain('Checking for Early Returns...')
+            ->assertExitCode(1)
             ->run();
 
         $writeln = Console::$instance->writeln;
+        array_pop($writeln);
 
-        $this->assertEquals($writeln, [
+        $this->assertEquals([
             ' Warning! This command is going to make "CHANGES" to your files!',
-            PHP_EOL.'1 fix applied to: early.php',
-        ]);
+            //'   1 fix applied to: early.php',
+            1 => '   1 code was refactored',
+            2 => '   '.PHP_EOL.'1 fix applied to: early.php',
+            3 => 'at app'.DIRECTORY_SEPARATOR.'early.php:1',
+            4 => '_______',
+        ], $writeln);
         $this->assertEquals([
             ' Do you have committed everything in git?',
             ' Do you want to flatten: app'.DIRECTORY_SEPARATOR.'early.php',
         ], Console::$askedConfirmations);
 
-        $this->assertEquals(
-            file_get_contents(__DIR__.'/CheckEarlyStubs/expected.stub'),
-            file_get_contents($this->tmpFileUnderTest())
+        $this->assertFileEquals(
+            __DIR__.'/CheckEarlyStubs/expected.stub',
+            $this->tmpFileUnderTest()
         );
-
-        $this->assertEquals(0, $r);
     }
 
     public function test_1()
@@ -79,14 +76,12 @@ class CheckEarlyTest extends TestCase
 
     public function test_no_fix()
     {
-        $r = $this->artisan('check:early_returns --nofix')->run();
+        $this->artisan('check:early_returns --nofix')->assertFailed()->run();
 
         $this->assertEquals(
             file_get_contents(__DIR__.'/CheckEarlyStubs/init.stub'),
             file_get_contents($this->tmpFileUnderTest())
         );
-
-        $this->assertEquals(0, $r);
     }
 
     private function tmpFileUnderTest()

@@ -2,6 +2,7 @@
 
 return [
     "auth_id" => [
+    	"tags" => "tag1,tag3",
         "search" => "protected function casts(): array",
     ],
 ];

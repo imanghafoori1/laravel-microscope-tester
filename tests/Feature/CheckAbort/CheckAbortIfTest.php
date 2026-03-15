@@ -2,34 +2,42 @@
 
 use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Support\Facades\File;
+use Imanghafoori\LaravelMicroscope\ErrorReporters\ErrorPrinter;
 use Imanghafoori\LaravelMicroscope\Foundations\Color;
 use Imanghafoori\LaravelMicroscope\Foundations\Console;
 
 class CheckAbortIfTest extends TestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+        Color::$color = false;
+        Console::recoredWrites();
+        ErrorPrinter::$instance = null;
+        ErrorPrinter::$terminalWidth = 10;
+    }
+
     public function tearDown(): void
     {
         Console::reset();
-        Color::$color = true;
         File::deleteDirectory($this->cachePath(), true);
         @unlink($this->tmpFileUnderTest());
+        ErrorPrinter::$instance = null;
         parent::tearDown();
     }
 
     public function test()
     {
-        Color::$color = false;
         copy(__DIR__.'/CheckAbortIfStubs/init.stub', $this->tmpFileUnderTest());
 
         $question = 'Do you want to replace abort_if.php with new version of it?';
         Console::fakeAnswer($question);
 
-        $r = $this->artisan('check:abort_if')->run();
+        $this->artisan('check:abort_if')->assertFailed()->run();
 
-        $this->assertEquals(1, 1);
-        $this->assertEquals(
-            file_get_contents(__DIR__.'/CheckAbortIfStubs/expected.stub'),
-            file_get_contents($this->tmpFileUnderTest())
+        $this->assertFileEquals(
+            __DIR__.'/CheckAbortIfStubs/expected.stub',
+            $this->tmpFileUnderTest()
         );
 
         $cacheFile = $this->cachePath().'abort_if-code-v1.php';

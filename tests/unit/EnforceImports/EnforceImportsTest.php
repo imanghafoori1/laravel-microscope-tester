@@ -1,9 +1,10 @@
 <?php
 
-namespace Imanghafoori\LaravelMicroscope\Tests\Unit;
+namespace Imanghafoori\LaravelMicroscope\Tests\Unit\EnforceImports;
 
-use Imanghafoori\LaravelMicroscope\Features\EnforceImports\EnforceImports;
+use Imanghafoori\LaravelMicroscope\Features\EnforceImports\EnforceImportsCheck;
 use Imanghafoori\LaravelMicroscope\Foundations\PhpFileDescriptor;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class EnforceImportsTest extends TestCase
@@ -18,10 +19,11 @@ class EnforceImportsTest extends TestCase
         unlink(__DIR__.'/imports.temp');
     }
 
+    #[Test]
     public function testFixFile()
     {
-        EnforceImports::setOptions(false, 'U3');
-        $result = EnforceImports::performCheck(
+        EnforceImportsCheck::setOptions(false, 'U3');
+        $result = EnforceImportsCheck::performCheck(
             PhpFileDescriptor::make(__DIR__.DIRECTORY_SEPARATOR.'imports.temp')
         );
 

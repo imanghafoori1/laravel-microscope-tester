@@ -9,15 +9,17 @@ class CheckGenericDocblocksTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
         Color::$color = false;
+        Console::recoredWrites();
         copy(__DIR__.'/CheckGenericDocblocksStubs/init.stub', $this->tmpFileUnderTest());
     }
 
     public function tearDown(): void
     {
         Console::reset();
-        Color::$color = true;
         @unlink($this->tmpFileUnderTest());
+
         parent::tearDown();
     }
 
@@ -25,19 +27,19 @@ class CheckGenericDocblocksTest extends TestCase
     {
         Console::enforceTrue();
 
-        $r = $this->artisan('check:generic_docblocks')
+        $this->artisan('check:generic_docblocks')
             ->expectsOutputToContain('7 generic doc-blocks were found.')
+            ->assertFailed()
             ->run();
 
         $this->assertEquals([
             'Do you want to remove doc-blocks from: HelloController.php'
         ], Console::$askedConfirmations);
 
-        $this->assertEquals(
-            file_get_contents(__DIR__.'/CheckGenericDocblocksStubs/expected.stub'),
-            file_get_contents($this->tmpFileUnderTest())
+        $this->assertFileEquals(
+            __DIR__.'/CheckGenericDocblocksStubs/expected.stub',
+            $this->tmpFileUnderTest()
         );
-        $this->assertEquals(1, $r);
     }
 
     private function tmpFileUnderTest()

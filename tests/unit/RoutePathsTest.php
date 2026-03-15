@@ -3,8 +3,8 @@
 namespace Tests\SpyClasses;
 
 use Illuminate\Foundation\Testing\TestCase;
-use Imanghafoori\LaravelMicroscope\SpyClasses\RoutePaths;
 use Imanghafoori\LaravelMicroscope\Foundations\FileReaders\BasePath;
+use Imanghafoori\LaravelMicroscope\SpyClasses\RoutePaths;
 use PHPUnit\Framework\Attributes\Test;
 
 class RoutePathsTest extends TestCase

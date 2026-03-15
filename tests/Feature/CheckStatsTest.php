@@ -11,13 +11,13 @@ class CheckStatsTest extends TestCase
 
     public function test()
     {
-        $r = $this->artisan('check:stats')
+        $errorCode = $this->artisan('check:stats')
             ->expectsOutputToContain('1 Models found.')
             ->expectsOutputToContain('1 Factories found.')
             ->expectsOutputToContain('1 Seeders found.')
             ->expectsOutputToContain('| 3 class | 0 trait | 0 interface | 0 enum |')
             ->run();
 
-        $this->assertEquals(0, $r);
+        $this->assertEquals(0, $errorCode);
     }
 }

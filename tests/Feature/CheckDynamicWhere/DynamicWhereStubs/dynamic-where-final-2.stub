@@ -1,0 +1,15 @@
+<?php
+
+namespace App;
+
+use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
+
+class B extends Model
+{
+	public function hello()
+	{
+		self::where('product_id', $id)->get();
+		self::where('id', 4)->where('product_id', $id)->get();
+	}
+}

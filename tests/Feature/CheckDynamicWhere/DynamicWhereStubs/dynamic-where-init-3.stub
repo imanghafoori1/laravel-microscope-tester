@@ -1,0 +1,14 @@
+<?php
+
+namespace App;
+
+use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
+
+class C extends Model3
+{
+	public function hello()
+	{
+		self::whereProductId($id)->get();
+	}
+}

@@ -1,9 +1,11 @@
 <?php
 
 use Illuminate\Foundation\Testing\TestCase;
+use Imanghafoori\LaravelMicroscope\ErrorReporters\ErrorPrinter;
 use Imanghafoori\LaravelMicroscope\Features\CheckView\Check\CheckView;
 use Imanghafoori\LaravelMicroscope\Features\SearchReplace\CachedFiles;
 use Imanghafoori\LaravelMicroscope\Foundations\Color;
+use Imanghafoori\LaravelMicroscope\Foundations\Console;
 
 class CheckViewsTest extends TestCase
 {
@@ -11,6 +13,9 @@ class CheckViewsTest extends TestCase
     {
         parent::setUp();
 
+        Console::recoredWrites();
+        ErrorPrinter::$instance = null;
+        ErrorPrinter::$terminalWidth = 10;
         CheckView::$cache = false;
         Color::$color = false;
         @mkdir(resource_path('views'), 0777, true);
@@ -26,28 +31,43 @@ class CheckViewsTest extends TestCase
         @unlink($this->getCacheFilePath());
         @rmdir(resource_path('views'));
         @rmdir(resource_path());
+
         CheckView::$cache = true;
-        Color::$color = true;
+        Console::reset();
+        ErrorPrinter::$instance = null;
+
         parent::tearDown();
     }
 
     public function test()
     {
         $ds = DIRECTORY_SEPARATOR;
-        $r = $this->artisan('check:views')
-            ->expectsOutputToContain('6 view references were checked to exist. (1 skipped)')
-            ->expectsOutputToContain('at app'.$ds.'Views.php:11')
-            ->expectsOutputToContain('at app'.$ds.'Views.php:12')
-            ->expectsOutputToContain('at app'.$ds.'Views.php:13')
-            ->expectsOutputToContain('The blade file is missing:')
-            ->expectsOutputToContain('abc.blade.php does not exist')
-            ->expectsOutputToContain('sdfv.blade.php does not exist')
-            ->expectsOutputToContain('bar.blade.php does not exist')
-            ->expectsOutputToContain('make.blade.php does not exist')
-            ->expectsOutputToContain('route_view.blade.php does not exist')
-            ->expectsOutputToContain('at resources'.$ds.'views'.$ds.'my-blade.blade.php:1')
-            ->expectsOutputToContain('at resources'.$ds.'views'.$ds.'my-blade.blade.php:3')
-            ->run();
+        $this->artisan('check:views')->assertFailed()->run();
+        $write = Console::$instance->writeln;
+        array_pop($write);
+
+        $this->assertEquals([
+            '   1 The blade file is missing:',
+            '   sdfv.blade.php does not exist',
+            "at resources{$ds}views{$ds}my-blade.blade.php:1",
+            '_______',
+            '   2 The blade file is missing:',
+            '   bar.blade.php does not exist',
+            "at resources{$ds}views{$ds}my-blade.blade.php:3",
+            '_______',
+            '   3 The blade file is missing:',
+            '   make.blade.php does not exist',
+            "at app{$ds}Views.php:11",
+            '_______',
+            '   4 The blade file is missing:',
+            '   route_view.blade.php does not exist',
+            "at app{$ds}Views.php:12",
+            '_______',
+            '   5 The blade file is missing:',
+            '   abc.blade.php does not exist',
+            "at app{$ds}Views.php:13",
+            '_______',
+        ], $write);
 
         $cache = $this->getCacheFilePath();
         $this->assertFileExists($cache);
@@ -62,7 +82,6 @@ class CheckViewsTest extends TestCase
             [10],
         ], $data));
         @unlink($cache);
-        $this->assertEquals(1, $r);
     }
 
     private function tmpFileUnderTest()

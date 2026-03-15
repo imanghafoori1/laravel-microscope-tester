@@ -13,6 +13,7 @@ class ForBladeFilesTest extends TestCase
 {
     public function setUp(): void
     {
+        parent::setUp();
         $ds = DIRECTORY_SEPARATOR;
         $dir = __DIR__.$ds.'views';
 
@@ -36,6 +37,7 @@ class ForBladeFilesTest extends TestCase
         unlink($dir.$ds.'b.blade.php');
         rmdir($dir.$ds.'a');
         unset($_SESSION['msg']);
+        parent::tearDown();
     }
 
     public function test_forBladeFiles()

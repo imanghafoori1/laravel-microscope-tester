@@ -3,6 +3,9 @@
 use App\Models\User;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Foundation\Testing\TestCase;
+use Imanghafoori\LaravelMicroscope\ErrorReporters\ErrorPrinter;
+use Imanghafoori\LaravelMicroscope\Features\EnforceImports\EnforceImportsCheck;
+use Imanghafoori\LaravelMicroscope\Features\EnforceImports\EnforceImportsHandler;
 use Imanghafoori\LaravelMicroscope\Features\FacadeAlias\FacadeAliasesCheck;
 use Imanghafoori\LaravelMicroscope\Foundations\Color;
 use Imanghafoori\LaravelMicroscope\Foundations\Console;
@@ -13,15 +16,9 @@ class CheckAliasesTest extends TestCase
     {
         parent::setUp();
         Color::$color = false;
-        Console::$instance = new class
-        {
-            public $writeln = [];
-
-            public function writeln($write)
-            {
-                $this->writeln[] = $write;
-            }
-        };
+        Console::recoredWrites();
+        ErrorPrinter::$instance = null;
+        ErrorPrinter::$terminalWidth = 10;
 
         copy(__DIR__.'/CheckFacadeAliasesStub/init.stub', $this->tmpFileUnderTest());
     }
@@ -29,9 +26,9 @@ class CheckAliasesTest extends TestCase
     public function tearDown(): void
     {
         Console::reset();
-        Color::$color = true;
         File::deleteDirectory(storage_path('framework/cache/microscope/'), true);
         FacadeAliasesCheck::$alias = '-all-';
+        EnforceImportsCheck::$onError = EnforceImportsHandler::class;
         @unlink($this->tmpFileUnderTest());
         parent::tearDown();
     }
@@ -57,48 +54,75 @@ class CheckAliasesTest extends TestCase
             'Do you want to replace MyAlias with App\Models\User',
             'Do you want to replace MyAlias2 with App\Models\User2',
         ], Console::$askedConfirmations);
-        $this->assertEquals(0, $r);
+
+        $this->assertEquals(1, $r);
 
         $this->assertEquals(
             str_replace("\r\n", "\n", file_get_contents(__DIR__.'/CheckFacadeAliasesStub/expected.stub')),
             str_replace("\r\n", "\n", file_get_contents($this->tmpFileUnderTest()))
         );
+
+        $this->assertFileExists(storage_path('framework/cache/microscope/check_facade_alias_command.php'));
+        $this->assertFileExists(storage_path('framework/cache/microscope/EnforceImports.php'));
+        $data = require storage_path('framework/cache/microscope/check_facade_alias_command.php');
+
+        $this->assertTrue(in_array('web.php', $data));
+        $this->assertTrue(in_array('a.php', $data));
+        $this->assertTrue(in_array('DatabaseSeeder.php', $data));
+        $this->assertFalse(in_array('Aliases.php', $data));
+
+        $r = $this->artisan('check:aliases')->run();
+        $this->assertEquals(0, $r);
+
+        $data = require storage_path('framework/cache/microscope/check_facade_alias_command.php');
+        $this->assertTrue(in_array('Aliases.php', $data));
     }
 
     public function test_no_fix()
     {
+        $ds = DIRECTORY_SEPARATOR;
+
         AliasLoader::getInstance()->alias('MyAlias', User::class);
         AliasLoader::getInstance()->alias('MyAlias2', 'App\\Models\\User2');
-        $this->artisan('check:aliases --nofix')->run();
+        $this->artisan('check:aliases --nofix')->assertFailed()->run();
 
-        $expected = [
-            '   Facade alias: Session for Illuminate\Support\Facades\Session',
-            '   at app\Aliases.php:6',
-            '   ',
-            '   Facade alias: Auth for Illuminate\Support\Facades\Auth',
-            '   at app\Aliases.php:7',
-            '   ',
-            '   Facade alias: Config for Illuminate\Support\Facades\Config',
-            '   at app\Aliases.php:7',
-            '   ',
-            '   Facade alias: Mate for Illuminate\Support\Facades\Request',
-            '   at app\Aliases.php:8',
-            '   ',
-            '   Facade alias: Rate for Illuminate\Support\Facades\Gate',
-            '   at app\Aliases.php:9',
-            '   ',
-            '   Facade alias: Response for Illuminate\Support\Facades\Response',
-            '   at app\Aliases.php:10',
-            '   ',
-            '   Facade alias: MyAlias for App\Models\User',
-            '   at app\Aliases.php:11',
-            '   ',
-            '   Facade alias: MyAlias2 for App\Models\User2',
-            '   at app\Aliases.php:12',
-            '   ',
-        ];
+        $write = Console::getInstance()->writeln;
+        array_pop($write);
 
-        $this->assertEquals($expected, Console::getInstance()->writeln);
+        $this->assertEquals([
+            '   1 Alias found:',
+            '   Session for Illuminate\Support\Facades\Session',
+            'at app'.$ds.'Aliases.php:6',
+            '_______',
+            '   2 Alias found:',
+            '   Auth for Illuminate\Support\Facades\Auth',
+            'at app'.$ds.'Aliases.php:7',
+            '_______',
+            '   3 Alias found:',
+            '   Config for Illuminate\Support\Facades\Config',
+            'at app'.$ds.'Aliases.php:7',
+            '_______',
+            '   4 Alias found:',
+            '   Mate for Illuminate\Support\Facades\Request',
+            'at app'.$ds.'Aliases.php:8',
+            '_______',
+            '   5 Alias found:',
+            '   Rate for Illuminate\Support\Facades\Gate',
+            'at app'.$ds.'Aliases.php:9',
+            '_______',
+            '   6 Alias found:',
+            '   Response for Illuminate\Support\Facades\Response',
+            'at app'.$ds.'Aliases.php:10',
+            '_______',
+            '   7 Alias found:',
+            '   MyAlias for App\Models\User',
+            'at app'.$ds.'Aliases.php:11',
+            '_______',
+            '   8 Alias found:',
+            '   MyAlias2 for App\Models\User2',
+            'at app'.$ds.'Aliases.php:12',
+            '_______',
+        ], $write);
 
         $this->assertEquals(
             str_replace("\r\n", "\n", file_get_contents(__DIR__.'/CheckFacadeAliasesStub/init.stub')),
@@ -108,17 +132,23 @@ class CheckAliasesTest extends TestCase
 
     public function test_no_fix_alias()
     {
+        $ds = DIRECTORY_SEPARATOR;
         $this->artisan('check:aliases --nofix --alias=Auth,Config')->run();
 
         $expected = [
-            0 => '   Facade alias: Auth for Illuminate\Support\Facades\Auth',
-            1 => '   at app\Aliases.php:7',
-            2 => '   ',
-            3 => '   Facade alias: Config for Illuminate\Support\Facades\Config',
-            4 => '   at app\Aliases.php:7',
-            5 => '   ',
+            '   1 Alias found:',
+            '   Auth for Illuminate\Support\Facades\Auth',
+            "at app{$ds}Aliases.php:7",
+            '_______',
+            '   2 Alias found:',
+            '   Config for Illuminate\Support\Facades\Config',
+            "at app{$ds}Aliases.php:7",
+            '_______',
         ];
-        $this->assertEquals($expected, Console::getInstance()->writeln);
+
+        $write = Console::getInstance()->writeln;
+        array_pop($write);
+        $this->assertEquals($expected, $write);
 
         $this->assertEquals(
             str_replace("\r\n", "\n", file_get_contents(__DIR__.'/CheckFacadeAliasesStub/init.stub')),

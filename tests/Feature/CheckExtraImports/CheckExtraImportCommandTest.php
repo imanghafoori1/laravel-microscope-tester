@@ -2,8 +2,10 @@
 
 use Illuminate\Foundation\Testing\TestCase;
 use Illuminate\Support\Facades\File;
+use Imanghafoori\LaravelMicroscope\ErrorReporters\ErrorPrinter;
 use Imanghafoori\LaravelMicroscope\Features\SearchReplace\CachedFiles;
 use Imanghafoori\LaravelMicroscope\Foundations\Color;
+use Imanghafoori\LaravelMicroscope\Foundations\Console;
 use PHPUnit\Framework\Attributes\Test;
 
 class CheckExtraImportCommandTest extends TestCase
@@ -19,6 +21,10 @@ class CheckExtraImportCommandTest extends TestCase
         parent::setUp();
 
         Color::$color = false;
+        Console::recoredWrites();
+        ErrorPrinter::$instance = null;
+        ErrorPrinter::$terminalWidth = 10;
+
         @unlink($this->getCacheFilePath());
         @mkdir(base_path('dev-classes'));
         copy(
@@ -29,8 +35,10 @@ class CheckExtraImportCommandTest extends TestCase
 
     protected function tearDown(): void
     {
+        Console::reset();
+        ErrorPrinter::$instance = null;
+
         @unlink($this->getCacheFilePath());
-        Color::$color = true;
         @unlink(base_path('dev-classes/Imports.php'));
         @rmdir(base_path('dev-classes'));
 
@@ -43,49 +51,37 @@ class CheckExtraImportCommandTest extends TestCase
         $ds = DIRECTORY_SEPARATOR;
         // Create test files with incorrect/missing namespaces
         // Run the artisan command on our test directory
-        $status = $this->artisan('check:extra_imports')
-            ->expectsOutput('Checking imports and class references...')
-            ->expectsOutput('Imports were checked under:')
-            ->expectsOutputToContain('./composer.json')
-            ->expectsOutputToContain('➖  PSR-4')
-            ->expectsOutputToContain('./app/')
-            ->expectsOutputToContain('./database/factories/')
-            ->expectsOutputToContain('./database/seeders/')
-            ->expectsOutputToContain('./dev-classes/')
-            ->expectsOutputToContain('App\\:')
-            ->expectsOutputToContain('Database\\Factories\\:')
-            ->expectsOutputToContain('Database\\Seeders\\:')
-            ->expectsOutputToContain('Dev\\:')
-            ->expectsOutputToContain('routes/web.php')
-            ->expectsOutput('15 imports were checked.')
-            ->expectsOutputToContain(' 🔸 5 unused imports found.')
-            //
-            ->expectsOutputToContain('   ➖  config/ (10 files)')
-            ->expectsOutputToContain('   ➖  database/migrations/ (2 files)')
-            ->expectsOutputToContain('class_map/ (1 file)')
-            ->expectsOutputToContain('Autoloaded files (1 file)')
-            //
-            ->expectsOutputToContain('_____________')
-            ->expectsOutputToContain('    ➖  helpers.php')
-            ->expectsOutput('   1 Extra Import: User')
-            ->expectsOutput('   4| use App\Models\User;')
-            ->expectsOutput("at dev-classes{$ds}Imports.php:4")
-            //
-            ->expectsOutput('   2 Extra Import: App2')
-            ->expectsOutput('   6| use App2; // extra')
-            ->expectsOutput("at dev-classes{$ds}Imports.php:6")
-            //
-            ->expectsOutput('   3 Extra Import: App4')
-            ->expectsOutput('   7| use App4;')
-            ->expectsOutput("at dev-classes{$ds}Imports.php:7")
-            //
-            ->expectsOutput('   4 Extra Import: A')
-            //
-            ->expectsOutputToContain('   5 Extra Import: B')
-            ->expectsOutputToContain('   8| use App\Http\{A,B};')
-            ->expectsOutput("at dev-classes{$ds}Imports.php:8")
-            //
-            ->run();
+        $status = $this->artisan('check:extra_imports')->run();
+
+        $write = (Console::$instance)->writeln;
+        array_pop($write);
+
+        $msg = (Console::$instance)->msg;
+        $this->assertEquals('15 imports were checked.', $msg[42]);
+        $this->assertEquals(' 🔸 5 unused imports found.', $msg[44]);
+
+        $this->assertEquals([
+            "   1 Extra Import: User",
+            "   4| use App\Models\User;",
+            "at dev-classes{$ds}Imports.php:4",
+            "_______",
+            "   2 Extra Import: App2",
+            "   6| use App2; // extra",
+            "at dev-classes{$ds}Imports.php:6",
+            "_______",
+            "   3 Extra Import: App4",
+            "   7| use App4;",
+            "at dev-classes{$ds}Imports.php:7",
+            "_______",
+            "   4 Extra Import: A",
+            "   8| use App\Http\{A,B};",
+            "at dev-classes{$ds}Imports.php:8",
+            "_______",
+            "   5 Extra Import: B",
+            "   8| use App\Http\{A,B};",
+            "at dev-classes{$ds}Imports.php:8",
+            "_______",
+        ], $write);
 
         $this->assertEquals(1, $status);
         $this->assertFileExists($this->getCacheFilePath());

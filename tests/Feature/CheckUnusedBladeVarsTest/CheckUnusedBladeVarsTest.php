@@ -2,7 +2,7 @@
 
 use Illuminate\Foundation\Testing\TestCase;
 use Imanghafoori\LaravelMicroscope\Features\CheckUnusedBladeVars\UnusedVarsInstaller;
-use Imanghafoori\LaravelMicroscope\Features\RouteOverride\RouteDefinitionPrinter;
+use Imanghafoori\LaravelMicroscope\Foundations\Console;
 
 class CheckUnusedBladeVarsTest extends TestCase
 {
@@ -17,6 +17,7 @@ class CheckUnusedBladeVarsTest extends TestCase
     public function test()
     {
         $logfile = storage_path('logs/test.log');
+        Console::recoredWrites();
 
         // make a sample blade file:
         @mkdir(resource_path('views'), 0777, true);

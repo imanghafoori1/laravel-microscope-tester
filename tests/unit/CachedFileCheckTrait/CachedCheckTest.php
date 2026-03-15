@@ -12,6 +12,7 @@ class CachedCheckTest extends TestCase
 {
     public function setUp(): void
     {
+        parent::setUp();
         CachedFiles::$folderPath = __DIR__.DIRECTORY_SEPARATOR;
         $file = __DIR__.DIRECTORY_SEPARATOR.'my_key_1.php';
         file_exists($file) && unlink($file);
@@ -23,6 +24,7 @@ class CachedCheckTest extends TestCase
         $file = __DIR__.DIRECTORY_SEPARATOR.'my_key_1.php';
         file_exists($file) && unlink($file);
         unset($_SERVER['count']);
+        parent::tearDown();
     }
 
     #[Test]

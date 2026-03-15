@@ -8,14 +8,14 @@ class CheckArrowFunctionTest extends TestCase
 {
     public function setUp(): void
     {
-        Color::$color = false;
         parent::setUp();
+        Color::$color = false;
+        Console::recoredWrites();
     }
 
     public function tearDown(): void
     {
         Console::reset();
-        Color::$color = true;
         @unlink($this->tmpFileUnderTest());
         parent::tearDown();
     }
@@ -26,7 +26,7 @@ class CheckArrowFunctionTest extends TestCase
 
         Console::enforceTrue();
 
-        $r = $this->artisan('check:arrow_functions')->run();
+        $this->artisan('check:arrow_functions')->assertFailed()->run();
 
         $this->assertEquals([
             'Do you want to replace arrow.php with new version of it?',
@@ -34,11 +34,9 @@ class CheckArrowFunctionTest extends TestCase
             'Do you want to replace arrow.php with new version of it?',
         ], Console::$askedConfirmations);
 
-        $this->assertEquals(1, $r);
-
-        $this->assertEquals(
-            file_get_contents(__DIR__.'/CheckArrowFunctionStub/expected.stub'),
-            file_get_contents($this->tmpFileUnderTest())
+        $this->assertFileEquals(
+            __DIR__.'/CheckArrowFunctionStub/expected.stub',
+            $this->tmpFileUnderTest()
         );
     }
 

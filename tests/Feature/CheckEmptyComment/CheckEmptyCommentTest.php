@@ -8,15 +8,17 @@ class CheckEmptyCommentTest extends TestCase
 {
     public function setUp(): void
     {
-        Color::$color = false;
         parent::setUp();
+
+        Color::$color = false;
+        Console::recoredWrites();
     }
 
     public function tearDown(): void
     {
         Console::reset();
-        Color::$color = true;
         @unlink($this->tmpFileUnderTest());
+
         parent::tearDown();
     }
 
@@ -25,7 +27,7 @@ class CheckEmptyCommentTest extends TestCase
         copy(__DIR__.'/CheckEmptyCommentStubs/init.stub', $this->tmpFileUnderTest());
         Console::enforceTrue();
 
-        $r = $this->artisan('check:empty_comments')->run();
+        $this->artisan('check:empty_comments')->assertFailed()->run();
 
         $this->assertEquals(
             [
@@ -36,10 +38,29 @@ class CheckEmptyCommentTest extends TestCase
             Console::$askedConfirmations
         );
 
-        $this->assertEquals(1, $r);
-        $this->assertEquals(
-            file_get_contents(__DIR__.'/CheckEmptyCommentStubs/expected.stub'),
-            file_get_contents($this->tmpFileUnderTest())
+        $writeln = Console::$instance->writeln;
+        array_pop($writeln);
+
+        $ds = DIRECTORY_SEPARATOR;
+        $eol = PHP_EOL;
+        $this->assertEquals([
+            "Replacing:$eol//",
+            "With:$eol",
+            "Replacement will occur at:",
+            "at app{$ds}empty_comment.php:5",
+            "Replacing:$eol//",
+            "With:$eol",
+            "Replacement will occur at:",
+            "at app{$ds}empty_comment.php:7",
+            "Replacing:$eol//",
+            "With:$eol",
+            "Replacement will occur at:",
+            "at app{$ds}empty_comment.php:9",
+        ], $writeln);
+
+        $this->assertFileEquals(
+            __DIR__.'/CheckEmptyCommentStubs/expected.stub',
+            $this->tmpFileUnderTest()
         );
     }
 
@@ -49,7 +70,7 @@ class CheckEmptyCommentTest extends TestCase
 
         Console::$forcedAnswer = false;
 
-        $r = $this->artisan('check:empty_comments')->run();
+        $this->artisan('check:empty_comments')->assertFailed()->run();
 
         $this->assertEquals([
             'Do you want to replace empty_comment.php with new version of it?',
@@ -57,11 +78,18 @@ class CheckEmptyCommentTest extends TestCase
             'Do you want to replace empty_comment.php with new version of it?',
         ] , Console::$askedConfirmations);
 
-        $this->assertEquals(1, $r);
-        $this->assertEquals(
-            file_get_contents(__DIR__.'/CheckEmptyCommentStubs/init.stub'),
-            file_get_contents($this->tmpFileUnderTest())
+        $this->assertFileEquals(
+            __DIR__.'/CheckEmptyCommentStubs/init.stub',
+            $this->tmpFileUnderTest()
         );
+
+        $cachePath = storage_path('framework/cache/microscope/delete_empty_comments-v1.php');
+        $this->assertFileExists($cachePath);
+
+        $content = require $cachePath;
+        $this->assertIsArray($content);
+
+        @unlink($cachePath);
     }
 
     private function tmpFileUnderTest()

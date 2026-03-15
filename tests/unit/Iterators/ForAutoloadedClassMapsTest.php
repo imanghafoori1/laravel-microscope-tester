@@ -14,6 +14,7 @@ class ForAutoloadedClassMapsTest extends TestCase
 {
     public function setUp(): void
     {
+        parent::setUp();
         $ds = DIRECTORY_SEPARATOR;
         BasePath::$path = __DIR__;
         $dir = __DIR__.$ds.'app'.$ds;
@@ -31,6 +32,7 @@ class ForAutoloadedClassMapsTest extends TestCase
 
         unset($_SESSION['file']);
         unset($_SESSION['msg']);
+        parent::tearDown();
     }
 
     public function test_forClassmaps()

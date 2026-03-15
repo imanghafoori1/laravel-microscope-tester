@@ -7,7 +7,7 @@ use App\R\T\U3;
 use C\E;
 use He\R\T\Hh as G;
 
-class A
+class EnforceImports
 {
 	public function W()
 	{
@@ -16,8 +16,10 @@ class A
 
 		\He\R\T\U2::class;
 		U3::class;
+		\App\R\U3::class;
 		U4::class;
 		\He\R\T\Hh::class;
         \He\R\T\G::class;
+        \App\EnforceImports::class;
 	}
 }

@@ -1,9 +1,9 @@
 <?php
 
-namespace Imanghafoori\LaravelMicroscope\Tests\Unit;
+namespace Imanghafoori\LaravelMicroscope\Tests\Unit\CheckFqcn;
 
 use Imanghafoori\LaravelMicroscope\ErrorReporters\ErrorPrinter;
-use Imanghafoori\LaravelMicroscope\Features\CheckExtraFQCN\ExtraFQCN;
+use Imanghafoori\LaravelMicroscope\Features\CheckExtraFQCN\ExtraFQCNCheck;
 use Imanghafoori\LaravelMicroscope\Foundations\PhpFileDescriptor;
 use JetBrains\PhpStorm\Pure;
 use PHPUnit\Framework\TestCase;
@@ -22,10 +22,10 @@ class CheckFqcnTest extends TestCase
 
     public function testFixFile()
     {
-        ExtraFQCN::$imports = self::class;
-        ExtraFQCN::$fix = true;
+        ExtraFQCNCheck::$imports = self::class;
+        ExtraFQCNCheck::$fix = true;
 
-        $result = ExtraFQCN::performCheck(PhpFileDescriptor::make(__DIR__.'/fqcn.temp'));
+        $result = ExtraFQCNCheck::performCheck(PhpFileDescriptor::make(__DIR__.'/fqcn.temp'));
 
         $actual = file_get_contents(__DIR__.'/fqcn.temp');
         $expected = file_get_contents(__DIR__.'/fqcn-expected.stub');

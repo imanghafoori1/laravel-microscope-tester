@@ -14,6 +14,7 @@ class CheckPsr12Test extends TestCase
 
     public function test()
     {
+        Console::recoredWrites();
         copy(__DIR__.'/CheckPsr12Stub/init.stub', $this->tmpFileUnderTest());
 
         Console::enforceTrue();

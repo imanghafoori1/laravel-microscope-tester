@@ -4,5 +4,14 @@ namespace App;
 
 use App\Models\User;
 
-User::whereProductId($id)->get();
-User::where('id', 4)->whereProductId($id)->get();
+class A extends Model2
+{
+	public function hello()
+	{
+		User::whereProductId($id)->get();
+		User::whereProductId($id)->where('user_id', $id)->get();
+		User::where('id', 4)->whereProductId($id)->get();
+		self::whereId(11)->get();
+		parent::whereId(11)->get();
+	}
+}

@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Support\Facades\Auth;
+
+class A
+{
+	function D()
+	{
+		User::id();
+		Auth::id();
+		self::id();
+	}
+}

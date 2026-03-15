@@ -1,0 +1,13 @@
+<?php
+
+return [
+    'auth_id' => [
+		'search' => '<name>::id();',
+		'replace' => '<1>()->id();',
+		'filters' => [
+			1 => [
+				'full_namespace_is' => 'Illuminate\\Support\\Facades\\*',
+			],
+		],
+    ],
+];

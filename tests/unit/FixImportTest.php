@@ -1,7 +1,7 @@
 <?php
 
-use Imanghafoori\LaravelMicroscope\Foundations\Analyzers\Fixer;
 use Illuminate\Foundation\Testing\TestCase;
+use Imanghafoori\LaravelMicroscope\Foundations\Analyzers\Fixer;
 use Imanghafoori\LaravelMicroscope\Foundations\ClassListProvider;
 use Imanghafoori\LaravelMicroscope\Foundations\PhpFileDescriptor;
 
