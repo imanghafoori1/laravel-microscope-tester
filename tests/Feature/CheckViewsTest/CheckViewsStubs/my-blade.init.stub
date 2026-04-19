@@ -1,3 +1,4 @@
 @extends('sdfv')
 
 @include('bar')
+@include('my-blade')
