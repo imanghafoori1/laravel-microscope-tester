@@ -20,16 +20,16 @@ class CheckBadPracticesTest extends TestCase
     public function tearDown(): void
     {
         @unlink($this->cacheFile());
-        @unlink(app_path('Env1.php'));
-        @unlink(app_path('Env2.php'));
+        @unlink(app_path('Models/Env1.php'));
+        @unlink(app_path('MyEnv2.php'));
         @unlink(app_path('EnvConfig1.php'));
         parent::tearDown();
     }
 
     public function test_0()
     {
-        copy(__DIR__.'/CheckEnvStubs/init.stub', app_path('Env1.php'));
-        copy(__DIR__.'/CheckEnvStubs/namespaced.stub', app_path('Env2.php'));
+        copy(__DIR__.'/CheckEnvStubs/init.stub', app_path('Models/Env1.php'));
+        copy(__DIR__.'/CheckEnvStubs/namespaced.stub', app_path('MyEnv2.php'));
         copy(__DIR__.'/CheckEnvStubs/config.stub', app_path('EnvConfig1.php'));
 
         $this->artisan('check:bad_practices')->assertFailed()->run();
@@ -40,15 +40,15 @@ class CheckBadPracticesTest extends TestCase
         $this->assertEquals([
             '   1 env() function found: ',
             "   5| env('s');",
-            "at app{$ds}Env1.php:5",
+            "at app{$ds}Models{$ds}Env1.php:5",
             '_______',
             '   2 env() function found: ',
             "   6| ENV('s');",
-            "at app{$ds}Env1.php:6",
+            "at app{$ds}Models{$ds}Env1.php:6",
             '_______',
             '   3 env() function found: ',
             "   9| env('d');",
-            "at app{$ds}Env2.php:9",
+            "at app{$ds}MyEnv2.php:9",
             '_______',
         ], $writeln);
 
@@ -58,7 +58,7 @@ class CheckBadPracticesTest extends TestCase
         $this->assertIsArray($array);
         $this->assertTrue(in_array('EnvConfig1.php', $array));
         $this->assertFalse(in_array('Env1.php', $array));
-        $this->assertFalse(in_array('Env2.php', $array));
+        $this->assertFalse(in_array('MyEnv2.php', $array));
     }
 
     private function cacheFile(): string
