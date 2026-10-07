@@ -40,13 +40,13 @@ class CheckBadPracticesTest extends TestCase
 
         $this->assertTrue(in_array('   1 env() function found: ', $writeln));
         $this->assertTrue(in_array('   9| env(\'d\');', $writeln));
-        $this->assertTrue(in_array('at app/MyEnv2.php:9', $writeln));
+        $this->assertTrue(in_array("at app{$ds}MyEnv2.php:9", $writeln));
         $this->assertTrue(in_array('   2 env() function found: ', $writeln));
         $this->assertTrue(in_array('   5| env(\'s\');', $writeln));
-        $this->assertTrue(in_array('at app/Models/Env1.php:5', $writeln));
+        $this->assertTrue(in_array("at app{$ds}Models{$ds}Env1.php:5", $writeln));
         $this->assertTrue(in_array('   3 env() function found: ', $writeln));
         $this->assertTrue(in_array('   6| ENV(\'s\');', $writeln));
-        $this->assertTrue(in_array('at app/Models/Env1.php:6', $writeln));
+        $this->assertTrue(in_array("at app{$ds}Models{$ds}Env1.php:6", $writeln));
         $this->assertTrue(in_array('_______', $writeln));
 
         $this->assertFileExists($this->cacheFile());
