@@ -9,7 +9,7 @@
     },
     "require-dev": {
         "imanghafoori/laravel-microscope": "dev-master",
-        "mockery/mockery": "^1.6",
+        "mockery/mockery": "^1.6.12",
         "nunomaduro/collision": "^8.6",
         "phpunit/phpunit": "^11.5.3"
     },
